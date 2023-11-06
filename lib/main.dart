@@ -1,73 +1,66 @@
+import 'package:dahagochi/hallOfFame.dart';
+import 'package:dahagochi/mainPage.dart';
+import 'package:dahagochi/myPage.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'calenderPage.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class _MyAppState extends State<MyApp> {
 
-  // This widget is the root of your application.
+  int _selectedIdx=0; // _는 private의 역할
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> screens = [MainPage(),Calender(),HallOfFame(),MyPage()];
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      home:Scaffold(
+        body:IndexedStack(
+          index: _selectedIdx,
+          children:screens,
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed, //눌러도 애니메이션 효과 없음
+          iconSize: 30,
+          selectedFontSize: 8,
+          unselectedFontSize: 8,
+          backgroundColor: Colors.white,
+          selectedItemColor: Colors.amber,
+          unselectedItemColor: Colors.black12,
+          showUnselectedLabels: true,
+          currentIndex: _selectedIdx,
+            onTap: (idx){ //네비게이션 바의 아이콘을 클릭했을 때
+              setState(() {
+                _selectedIdx=idx; //아이콘의 index를 받아와서 selectedIdx에 대입
+              });//그렇게되면 setState()가 state가 바뀜 전달 => 화면 다시 렌더링
+            },
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_filled),
+                label: "오늘일정",
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: "캘린더",
             ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.emoji_events_outlined),
+              label: "명예의전당",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.more_horiz),
+              label: "마이페이지",
+            )
+
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      )
     );
   }
 }
