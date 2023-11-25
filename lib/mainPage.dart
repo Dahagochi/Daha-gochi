@@ -7,13 +7,19 @@ import 'package:flutter/material.dart';
 // 계획리스트 표시하는 컨테이너 리스트화
 
 class MainPage extends StatelessWidget {
+
+  void onchange() => {};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.amber[100],
       body: Column(
         children: [
-          Expanded(                     // 계획 리스트를 나열할 임시 컨테이너 (화면 상단에 정렬)
+
+          //// 계획 리스트를 컨테이너 ////
+
+          Expanded(
             child : Container(
               height: 150,
               width: double.infinity,
@@ -23,10 +29,50 @@ class MainPage extends StatelessWidget {
                 color: Colors.white,
                 border: Border.all(color: Colors.black),
               ),
-            ),
+              child: ListView.separated(        //// 계획리스트 및 체크박스 표시
+                padding: const EdgeInsets.all(8),
+                itemCount: 4,        // temp value
+                // itemCount: 리스트이름.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    padding: EdgeInsets.all(5),
+                    height: 75,
+                    color: Colors.amber,
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text('hi'),
+                            flex: 5,
+                        ),
+                        Expanded(
+                            child: Container(
+                              child: Checkbox(value: true, onChanged: (value) {},
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  left: BorderSide(color: Colors.black),
+                                ),
+                              ),
+                            ),
+
+                            flex : 1,
+                        )
+
+                      ],
+                    ),
+                  );
+                },
+                  separatorBuilder: (BuildContext context, int index) => const Divider(),
+                ),
+
+
+              ),
             flex: 4,
           ),
-          Expanded(                   // 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬)
+
+          //// 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬) ////
+
+          Expanded(
             flex: 1,
               child: Container(
                 height: 150,
