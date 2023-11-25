@@ -13,65 +13,81 @@ class MainPage extends StatelessWidget {
       backgroundColor: Colors.amber[100],
       body: Column(
         children: [
-          Container(               // 계획 리스트를 나열할 임시 컨테이너 (화면 상단에 정렬)
-            height: 150,
-            width: 300,
-            padding: EdgeInsets.all(10),
-            margin: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black),
+          Expanded(                     // 계획 리스트를 나열할 임시 컨테이너 (화면 상단에 정렬)
+            child : Container(
+              height: 150,
+              width: double.infinity,
+              padding: EdgeInsets.all(10),
+              margin: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Colors.black),
+              ),
             ),
+            flex: 4,
           ),
-          Container(               // 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬)
-            height: 150,
-            width: 300,
-            padding: EdgeInsets.all(10),
-            margin: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.black),
-            ),
-            child: Row(
-              children: [
-                Container(           // 캐릭터 이미지 표시  (중앙 정렬)
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.black,
-                    border: Border.all(color: Colors.black),
-                  ),
-                  width: 100,
-                  height: 100,
+          Expanded(                   // 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬)
+            flex: 1,
+              child: Container(
+                height: 150,
+                width: double.infinity,
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.black),
                 ),
-                Container(          // 대사, 성장도 게이지 표시  (중앙 정렬)
-                  child: Column(
-                    children: [
-                      Container(        // 캐릭터 대사 컨테이너
-                        height: 30,
-                        width: 150,
-                        padding: EdgeInsets.all(5),
-                        margin: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          border: Border.all(color: Colors.black),
+                child: Row(
+                  children: [
+                    Container(           // 캐릭터 이미지 표시  (중앙 정렬)
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black,
+                        border: Border.all(color: Colors.black),
+                      ),
+                      margin: EdgeInsets.symmetric(horizontal: 15),
+                      width: 100,
+                      height: 100,
+                    ),
+                    Expanded(
+                      child: Container(          // 대사, 성장도 게이지 표시  (중앙 정렬)
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child:Container(        // 캐릭터 대사 컨테이너(Text위젯으로 변경예정)
+                                height: 30,
+                                width: double.infinity,
+                                padding: EdgeInsets.all(5),
+                                margin: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  border: Border.all(color: Colors.black),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(         // 성장도 게이지 컨테이너(gauge 구현 )
+                                height: 30,
+                                width: double.infinity,
+                                padding: EdgeInsets.all(5),
+                                margin: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  border: Border.all(color: Colors.black),
+                                ),
+                              ),
+                            ),
+
+                          ],
                         ),
                       ),
-                      Container(         // 성장도 게이지 컨테이너
-                        height: 30,
-                        width: 150,
-                        padding: EdgeInsets.all(5),
-                        margin: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          border: Border.all(color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+
+                  ],
                 ),
-              ],
-            ),
-          )
+              )
+          ),
+
         ],
       ),
     );
