@@ -2,10 +2,27 @@ import 'package:dahagochi/hallOfFame.dart';
 import 'package:dahagochi/mainPage.dart';
 import 'package:dahagochi/myPage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'buecketService.dart';
 import 'calenderPage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => BucketService()),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -15,11 +32,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   int _selectedIdx=0; // _는 private의 역할
-
   @override
   Widget build(BuildContext context) {
     List<Widget> screens = [MainPage(),Calender(),HallOfFame(),MyPage()];
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.amber,
+      ),
       home:Scaffold(
         body:IndexedStack(
           index: _selectedIdx,

@@ -13,6 +13,12 @@ dependencies:
 
 
   cupertino_icons: ^1.0.2
+  firebase_core: ^2.23.0
+  cloud_firestore: ^4.13.2
+  calendar_timeline: ^1.1.2
+  table_calendar: ^3.0.9
+  firebase_auth: ^4.14.1
+  provider: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -26,4 +32,4 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/=
+    - assets/
