@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
           selectedFontSize: 8,
           unselectedFontSize: 8,
           backgroundColor: Colors.white,
-          selectedItemColor: Colors.amber,
+          selectedItemColor: Colors.lightGreen,
           unselectedItemColor: Colors.black12,
           showUnselectedLabels: true,
           currentIndex: _selectedIdx,
