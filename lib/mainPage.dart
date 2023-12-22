@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'planlist.dart';
 import 'charactor.dart';
 import 'package:primer_progress_bar/primer_progress_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 
-// 캐릭터 대사 txt asset 작성하기
-// 캐릭터 임시 이미지 가져오기
 
 class MainPage extends StatefulWidget{
 
@@ -15,12 +14,69 @@ class MainPage extends StatefulWidget{
 
 class MainPageState extends State<MainPage> {
 
+  SharedPreferences? prefs;
   List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Done"), valueLabel: Text('123/243'))];
 
   var tempList = <int?>[1, 2, 3];
   bool check = false;
   // var listLength = tempList.length;
   void onchange() => {};
+
+
+  _checkFirstOpenOfMonth() async {
+    prefs = await SharedPreferences.getInstance();
+
+    // Get the current month and year
+    DateTime now = DateTime.now();
+    String currentMonthYear = DateFormat('yyyy-MM').format(now);
+
+    // Get the stored month and year
+    String? storedMonthYear = prefs!.getString('lastOpenMonthYear');
+
+    // If it's the first open or a new month, show an alert
+    //if (storedMonthYear == null || storedMonthYear != currentMonthYear) {
+    if (1==1) {
+      // Show an alert or perform any action for the first open in the month
+      _showAlert();
+
+      // Update the stored month and year
+      prefs!.setString('lastOpenMonthYear', currentMonthYear);
+    }
+  }
+
+  _showAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("새로운 친구!"),
+          content: Column(
+            children: [
+              Center(
+                child: Image.asset('assets/images/zero.png', width: 200, height: 200,),          //해결필요
+              ),
+              Text("이번달도 계획을 실천하고"),
+              Text("친구와 함께 성장해 보아요!"),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFirstOpenOfMonth();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +166,7 @@ class MainPageState extends State<MainPage> {
                       margin: EdgeInsets.symmetric(horizontal: 10),
                       width: 120,
                       height: 120,
+                      child: Image.asset('assets/images/zero.png'),
                     ),
                     Expanded(
                       child: Container(          // 대사, 성장도 게이지 표시  (중앙 정렬)
