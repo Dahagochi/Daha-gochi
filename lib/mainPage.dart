@@ -34,13 +34,11 @@ class MainPageState extends State<MainPage> {
     String? storedMonthYear = prefs!.getString('lastOpenMonthYear');
 
     // If it's the first open or a new month, show an alert
-    //if (storedMonthYear == null || storedMonthYear != currentMonthYear) {
-    if (1==1) {
-      // Show an alert or perform any action for the first open in the month
-      _showAlert();
 
-      // Update the stored month and year
-      prefs!.setString('lastOpenMonthYear', currentMonthYear);
+    //if (storedMonthYear == null || storedMonthYear != currentMonthYear) {
+    if (1==1) {  // debug
+      _showAlert();
+      prefs!.setString('lastOpenMonthYear', currentMonthYear);  // 저장된 날짜 최신화
     }
   }
 
