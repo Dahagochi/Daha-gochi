@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+//승원이 메인 페이지
 class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
