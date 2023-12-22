@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'charactor.dart';
+import 'package:provider/provider.dart';
+import 'character.dart';
 import 'package:primer_progress_bar/primer_progress_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'bucketService.dart';
 
 
 
@@ -15,13 +17,8 @@ class MainPage extends StatefulWidget{
 class MainPageState extends State<MainPage> {
 
   SharedPreferences? prefs;
-  List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Done"), valueLabel: Text('123/243'))];
-
-  var tempList = <int?>[1, 2, 3];
-  bool check = false;
-  // var listLength = tempList.length;
-  void onchange() => {};
-
+  List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Done"), valueLabel: Text('123/243'))];   //temp value
+  List<Bucket> todayList = [];
 
   _checkFirstOpenOfMonth() async {
     prefs = await SharedPreferences.getInstance();
@@ -36,9 +33,15 @@ class MainPageState extends State<MainPage> {
     // If it's the first open or a new month, show an alert
 
     //if (storedMonthYear == null || storedMonthYear != currentMonthYear) {
-    if (1==1) {  // debug
+    if (1==1) {  // for debug
+      // MatureCharacter c = MatureCharacter();
+      // c.addCharacter(character);
+
+      MyCharacter character = MyCharacter(name:'tempname', birth:currentMonthYear);
+
       _showAlert();
       prefs!.setString('lastOpenMonthYear', currentMonthYear);  // 저장된 날짜 최신화
+
     }
   }
 
@@ -51,7 +54,7 @@ class MainPageState extends State<MainPage> {
           content: Column(
             children: [
               Center(
-                child: Image.asset('assets/images/zero.png', width: 200, height: 200,),          //해결필요
+                child: Image.asset('assets/images/0.png', width: 200, height: 200,),          //해결필요
               ),
               Text("이번달도 계획을 실천하고"),
               Text("친구와 함께 성장해 보아요!"),
@@ -73,148 +76,166 @@ class MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+
     _checkFirstOpenOfMonth();
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.lightGreen[100],
-      body: Column(
-        children: [
+    DateTime now = DateTime.now();
+    return Consumer<BucketService>(
+        builder: (context, bucketService, child) {
+          todayList = bucketService.getByDate(now);
+          return Scaffold(
+            backgroundColor: Colors.lightGreen[100],
+            body: Column(
+              children: [
 
-          //// 계획 리스트 컨테이너 ////
+                //// 계획 리스트 컨테이너 ////
 
-          Expanded(
-            flex: 3,
-            child : Container(
-              height: 150,
-              width: double.infinity,
-              padding: EdgeInsets.all(10),
-              margin: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.black),
-              ),
-              child: ListView.separated(        //// 계획리스트 및 체크박스 표시   /// 리스트길이==0일경우 캘린더이동버튼표시
-                padding: const EdgeInsets.all(8),
-                itemCount: 4,        // temp value
-                // itemCount: 리스트이름.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Container(
-                    padding: EdgeInsets.all(5),
-                    height: 75,
-                    color: Colors.lightGreen,
-                    child: Row(
-                      children: [
-                        Expanded(
-                            flex: 5,
-                            child: Text('hi'),
-                        ),
-                        Expanded(
-                            flex : 1,
-                            child: Container(
-                              decoration: const BoxDecoration(   //const?
-                                border: Border(
-                                  left: BorderSide(color: Colors.black),
-                                ),
-                              ),
-                              child: Checkbox(
-                                value: check,
-                                onChanged: (value){
-                                  setState(() {
-                                  check = value!;                       /// 계획별 check멤버로 교체하기
-                                  });
-                                },
-
-
-                              ),
-                            ),
-                        )
-                      ],
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    height: 150,
+                    width: double.infinity,
+                    padding: EdgeInsets.all(10),
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.black),
                     ),
-                  );
-                },
-                  separatorBuilder: (BuildContext context, int index) => const Divider(),
-                ),
-              ),
-          ),
 
-          //// 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬) ////
 
-          Expanded(
-            flex: 1,
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.black),
+                    child: todayList.isEmpty
+                      ? Center(
+                        child: ElevatedButton(
+                          child: Text('오늘의 계획을 세워보세요!'),
+                          onPressed: () async {
+                            var value = await Navigator.pushNamed(context, '/calender');
+                            print(value);
+                          },         //캘린더 페이지로 이동,
+                        ),
+                      )
+                        :ListView.separated( //// 계획리스트 및 체크박스 표시   /// 리스트길이==0일경우 캘린더이동버튼표시
+                      padding: const EdgeInsets.all(8),
+                      // itemCount: 4, // temp for debug
+                      itemCount: todayList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        // 역순으로 보여주기
+                        int i = todayList.length - index - 1;
+                        Bucket bucket = todayList[i];
+                        return ListTile(
+                          /// text
+                          title: Text(
+                            bucket.text,
+                            style: TextStyle(
+                              fontSize: 24,
+                              color: Colors.black,
+                            ),
+                          ),
+
+                          /// createdAt
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                  value: bucket.isDone,
+                                  onChanged: (value){
+                                    bucket.isDone=!bucket.isDone;
+
+                                    setState(() {});
+                                  }
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) => const Divider(),
+                    ),
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Container(           // 캐릭터 이미지 표시  (중앙 정렬)
+
+                //// 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬) ////
+
+                Expanded(
+                    flex: 1,
+                    child: Container(
+                      height: 150,
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.lightGreen,
+                        color: Colors.white,
                         border: Border.all(color: Colors.black),
                       ),
-                      margin: EdgeInsets.symmetric(horizontal: 10),
-                      width: 120,
-                      height: 120,
-                      child: Image.asset('assets/images/zero.png'),
-                    ),
-                    Expanded(
-                      child: Container(          // 대사, 성장도 게이지 표시  (중앙 정렬)
-                        child: Column(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child:Container(        /// 캐릭터 대사 컨테이너(Text위젯으로 변경예정)
-                                height: 30,
-                                width: double.infinity,
-                                padding: EdgeInsets.all(5),
-                                margin: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  // shape: ,
-                                  color: Colors.lightGreen,
-                                  border: Border.all(color: Colors.black),
-                                ),
-                                child: Center(
-                                    child: Text('hi'),
-                                ),
+                      child: Row(
+                        children: [
+                          Container( // 캐릭터 이미지 표시  (중앙 정렬)
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.lightGreen,
+                              border: Border.all(color: Colors.black),
+                            ),
+                            margin: EdgeInsets.symmetric(horizontal: 10),
+                            width: 120,
+                            height: 120,
+                            child: Image.asset('assets/images/0.png'),
+                          ),
+                          Expanded(
+                            child: Container( // 대사, 성장도 게이지 표시  (중앙 정렬)
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(
+
+                                      /// 캐릭터 대사 컨테이너(Text위젯으로 변경예정)
+                                      height: 30,
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(5),
+                                      margin: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        // shape: ,
+                                        color: Colors.lightGreen,
+                                        border: Border.all(color: Colors.black),
+                                      ),
+                                      child: Center(
+                                        child: Text('hi'),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+
+                                      /// 성장도 게이지 컨테이너(progress bar class구현)
+                                      height: 120,
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(5),
+                                      margin: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        color: Colors.lightGreen,
+                                        border: Border.all(color: Colors.black),
+                                      ),
+                                      child: Center(
+                                        child: PrimerProgressBar(
+                                            segments: segments, maxTotalValue: 100),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            Expanded(
-                              flex: 3,
-                              child: Container(         /// 성장도 게이지 컨테이너(progress bar class구현)
-                                height: 120,
-                                width: double.infinity,
-                                padding: EdgeInsets.all(5),
-                                margin: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Colors.lightGreen,
-                                  border: Border.all(color: Colors.black),
-                                ),
-                                child: Center(
-                                  child: PrimerProgressBar(segments: segments, maxTotalValue: 100),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                    )
                 ),
-              )
-          ),
-        ],
-      ),
-    );
-  }
+              ],
+            ),
+          );
+  },);}
 }
 
 // class growthRate{
