@@ -3,15 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'bottomNav.dart';
 
 import 'bucketService.dart';
 
-class Calender extends StatefulWidget {
+class Calendar extends StatefulWidget {
   @override
-  State<Calender> createState() => _CalenderState();
+  State<Calendar> createState() => _CalendarState();
 }
 
-class _CalenderState extends State<Calender> {
+class _CalendarState extends State<Calendar> {
   CalendarFormat calendarFormat = CalendarFormat.month;
   // 선택된 날짜
   DateTime selectedDate = DateTime.now();
@@ -336,7 +337,7 @@ class _CalenderState extends State<Calender> {
 
 // import 'package:flutter/material.dart';
 //
-// class Calender extends StatelessWidget {
+// class Calendar extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(

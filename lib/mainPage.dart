@@ -1,3 +1,5 @@
+// 코드 편집자 : 정승원
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'character.dart';
@@ -5,6 +7,7 @@ import 'package:primer_progress_bar/primer_progress_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'bucketService.dart';
+import "dart:math";
 
 
 
@@ -17,8 +20,9 @@ class MainPage extends StatefulWidget{
 class MainPageState extends State<MainPage> {
 
   SharedPreferences? prefs;
-  List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Done"), valueLabel: Text('123/243'))];   //temp value
+  List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Done"), valueLabel: Text('123 / 150'))];   //temp value
   List<Bucket> todayList = [];
+  // MyCharacter character;
 
   _checkFirstOpenOfMonth() async {
     prefs = await SharedPreferences.getInstance();
@@ -37,7 +41,7 @@ class MainPageState extends State<MainPage> {
       // MatureCharacter c = MatureCharacter();
       // c.addCharacter(character);
 
-      MyCharacter character = MyCharacter(name:'tempname', birth:currentMonthYear);
+      //MyCharacter character = MyCharacter(name:'tempname', birth:currentMonthYear);
 
       _showAlert();
       prefs!.setString('lastOpenMonthYear', currentMonthYear);  // 저장된 날짜 최신화
@@ -51,14 +55,17 @@ class MainPageState extends State<MainPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("새로운 친구!"),
-          content: Column(
-            children: [
-              Center(
-                child: Image.asset('assets/images/0.png', width: 200, height: 200,),          //해결필요
-              ),
-              Text("이번달도 계획을 실천하고"),
-              Text("친구와 함께 성장해 보아요!"),
-            ],
+          content: Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Image.asset('assets/images/0.png', width: 200, height: 200,),
+                ),
+                Text("이번 달도 계획을 실천하고"),
+                Text("친구와 함께 성장해 보아요!"),
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -76,9 +83,10 @@ class MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    // _checkFirstOpen();     // 도움말 dialog 표시하기
+    _checkFirstOpenOfMonth();      // _checkFirstOpen()함수의 기능 통합
 
-    _checkFirstOpenOfMonth();
-
+    // MyCharacter character = ;    // character 불러오기
   }
 
   @override
@@ -102,8 +110,8 @@ class MainPageState extends State<MainPage> {
                     padding: EdgeInsets.all(10),
                     margin: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.black),
+                      color: Colors.lightGreen[100],
+                      //border: Border.all(color: Colors.black),
                     ),
 
 
@@ -111,10 +119,7 @@ class MainPageState extends State<MainPage> {
                       ? Center(
                         child: ElevatedButton(
                           child: Text('오늘의 계획을 세워보세요!'),
-                          onPressed: () async {
-                            var value = await Navigator.pushNamed(context, '/calender');
-                            print(value);
-                          },         //캘린더 페이지로 이동,
+                          onPressed: () {Navigator.pushNamed(context, '/calendar');},         //캘린더 페이지로 이동,
                         ),
                       )
                         :ListView.separated( //// 계획리스트 및 체크박스 표시   /// 리스트길이==0일경우 캘린더이동버튼표시
@@ -166,7 +171,8 @@ class MainPageState extends State<MainPage> {
                       padding: EdgeInsets.all(10),
                       margin: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.lightGreen[100],
                         border: Border.all(color: Colors.black),
                       ),
                       child: Row(
@@ -187,7 +193,7 @@ class MainPageState extends State<MainPage> {
                               child: Column(
                                 children: [
                                   Expanded(
-                                    flex: 2,
+                                    // flex: 2,
                                     child: Container(
 
                                       /// 캐릭터 대사 컨테이너(Text위젯으로 변경예정)
@@ -201,23 +207,24 @@ class MainPageState extends State<MainPage> {
                                         border: Border.all(color: Colors.black),
                                       ),
                                       child: Center(
-                                        child: Text('hi'),
+                                        // child: Text('${(character.comments..shuffle()).first;}'),
+                                        child: Text('오늘도 화이팅!'),        // temp for debug
                                       ),
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 3,
-                                    child: Container(
+                                    // flex: 3,
+                                    child: SizedBox(
 
                                       /// 성장도 게이지 컨테이너(progress bar class구현)
-                                      height: 120,
+                                      height: 100,
                                       width: double.infinity,
-                                      padding: EdgeInsets.all(5),
-                                      margin: EdgeInsets.all(5),
-                                      decoration: BoxDecoration(
-                                        color: Colors.lightGreen,
-                                        border: Border.all(color: Colors.black),
-                                      ),
+                                      // padding: EdgeInsets.all(5),
+                                      // margin: EdgeInsets.all(5),
+                                      // decoration: BoxDecoration(
+                                      //   color: Colors.lightGreen,
+                                      //   border: Border.all(color: Colors.black),
+                                      // ),
                                       child: Center(
                                         child: PrimerProgressBar(
                                             segments: segments, maxTotalValue: 100),

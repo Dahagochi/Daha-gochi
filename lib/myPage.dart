@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'bottomNav.dart';
 
 class MyPage extends StatelessWidget {
   @override
@@ -8,6 +9,7 @@ class MyPage extends StatelessWidget {
       body: Center(
         child: Text("마이페이지", textScaleFactor: 3.0),
       ),
+      // bottomNavigationBar: BottomNav(),
     );
   }
 }

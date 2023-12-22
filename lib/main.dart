@@ -4,9 +4,10 @@ import 'package:dahagochi/myPage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'bucketService.dart';
-import 'calenderPage.dart';
+import 'calendarPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'firebase_options.dart';
+import 'bottomNav.dart';
 
 void main() async {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => BucketService()),
+        //ChangeNotifierProvider(create: (context) => BottomNav()),
       ],
       child: MyApp(),
     ),
@@ -34,8 +36,9 @@ class _MyAppState extends State<MyApp> {
   int _selectedIdx=0; // _는 private의 역할
   @override
   Widget build(BuildContext context) {
-    List<Widget> screens = [MainPage(),Calender(),HallOfFame(),MyPage()];
+    List<Widget> screens = [MainPage(),Calendar(),HallOfFame(),MyPage()];
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.amber,
         ),
@@ -50,7 +53,7 @@ class _MyAppState extends State<MyApp> {
             selectedFontSize: 8,
             unselectedFontSize: 8,
             backgroundColor: Colors.white,
-            selectedItemColor: Colors.amber,
+            selectedItemColor: Colors.lightGreen,
             unselectedItemColor: Colors.black12,
             showUnselectedLabels: true,
             currentIndex: _selectedIdx,
@@ -80,12 +83,12 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-      routes: <String, WidgetBuilder>{
-      //'/': (BuildContext ctx) => MainPage(),
-      '/calendar': (BuildContext ctx) => Calender(),
-      '/hallOfFame': (BuildContext ctx) => HallOfFame(),
-      '/mypage': (BuildContext ctx) => MyPage(),
-      },
+      // routes: <String, WidgetBuilder>{
+      // //'/': (BuildContext ctx) => MainPage(),
+      // '/calendar': (BuildContext ctx) => Calendar(),
+      // '/hallOfFame': (BuildContext ctx) => HallOfFame(),
+      // '/mypage': (BuildContext ctx) => MyPage(),
+      // },
     );
   }
 }
