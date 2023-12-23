@@ -41,7 +41,7 @@ class _CalendarPageState extends State<CalendarPage> {
           resizeToAvoidBottomInset: false,
           body: SafeArea(
             child: Container(
-              color: Colors.grey[100],
+              color: Colors.lightGreen[100],
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 25),
                 child: Column(
@@ -60,6 +60,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       ),
                     ),
                     showCalender(bucketService),
+                    SizedBox(height: 5,),
                     Expanded(
                         child: TodayBucketList(selectedDate: selectedDate)
                     ),

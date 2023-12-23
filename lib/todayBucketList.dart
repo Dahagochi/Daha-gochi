@@ -29,6 +29,7 @@ class _TodayBucketListState extends State<TodayBucketList> {
         return FutureBuilder<QuerySnapshot>(
           future: bucketService.read(user.uid, widget.selectedDate),
           builder: (context, snapshot) {
+
             final documents =
                 snapshot.data?.docs ?? []; // 문서들 가져오기
             if (documents.isEmpty) {

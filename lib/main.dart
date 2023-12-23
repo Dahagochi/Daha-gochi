@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'auth_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'bucketService.dart';
-import 'calenderPage.dart';
+import 'calendarPage.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'character.dart';
@@ -24,7 +24,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => BucketService()),
-        // ChangeNotifierProvider(create: (context) => MyCharacter()),
+        ChangeNotifierProvider(create: (context) => Character()),
       ],
       child: const MyApp(),
     ),
@@ -172,7 +172,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> screens = [MainPage(), CalenderPage(), HallOfFame(), MyPage()];
+    List<Widget> screens = [MainPage(), CalendarPage(), HallOfFame(), MyPage()];
     return MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.amber,
