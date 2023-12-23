@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.dahagochi">
     <application
-        android:label="dahagochi"
+        android:label="random_die"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

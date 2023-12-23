@@ -11,7 +11,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-
+  time_picker_spinner: ^0.0.1
+  smooth_page_indicator : ^1.1.0
+  shared_preferences : ^2.0.0
   cupertino_icons: ^1.0.2
   primer_progress_bar: ^0.3.0
   shared_preferences: ^2.2.2
@@ -40,6 +42,7 @@ flutter:
     - assets/
     - images/
     - assets/images/
+    - sounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -66,3 +69,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
