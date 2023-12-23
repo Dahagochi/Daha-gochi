@@ -6,49 +6,185 @@ import 'package:provider/provider.dart';
 import 'bucketService.dart';
 import 'calendarPage.dart';
 import 'package:firebase_core/firebase_core.dart';
-// import 'firebase_options.dart';
+import 'firebase_options.dart';
 import 'bottomNav.dart';
+import 'package:flutter/cupertino.dart';
+import 'auth_service.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'character.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await initializeDateFormatting("ko_KR", null);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => BucketService()),
-        //ChangeNotifierProvider(create: (context) => BottomNav()),
+        ChangeNotifierProvider(create: (context) => AuthService()),
+        // ChangeNotifierProvider(create: (context) => MyCharacter()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-class _MyAppState extends State<MyApp> {
-
-  int _selectedIdx=0; // _는 private의 역할
   @override
   Widget build(BuildContext context) {
-    List<Widget> screens = [MainPage(),Calendar(),HallOfFame(),MyPage()];
+    final user = context.read<AuthService>().currentUser();
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.lightGreen, // App의 기본 색상
+        scaffoldBackgroundColor: Colors.white, // Scaffold의 배경 색상
+      ),
+      debugShowCheckedModeBanner: false,
+      home: user == null ? LoginPage() : HomePage(),
+    );
+  }
+}
+
+/// 로그인 페이지
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        final user = authService.currentUser();
+        return Scaffold(
+          appBar: AppBar(title: Text("로그인")),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                /// 현재 유저 로그인 상태
+                Center(
+                  child: Text(
+                    user == null ? "로그인해 주세요 🙂" : "${user.email}님 안녕하세요 👋",
+                    style: TextStyle(
+                      fontSize: 24,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 32),
+
+                /// 이메일
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(hintText: "이메일"),
+                ),
+
+                /// 비밀번호
+                TextField(
+                  controller: passwordController,
+                  obscureText: false, // 비밀번호 안보이게
+                  decoration: InputDecoration(hintText: "비밀번호"),
+                ),
+                SizedBox(height: 32),
+
+                /// 로그인 버튼
+                ElevatedButton(
+                  child: Text("로그인", style: TextStyle(fontSize: 21)),
+                  onPressed: () {
+                    // 로그인
+                    authService.signIn(
+                      email: emailController.text,
+                      password: passwordController.text,
+                      onSuccess: () {
+                        // 로그인 성공
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("로그인 성공"),
+                        ));
+
+                        // HomePage로 이동
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                        );
+                      },
+                      onError: (err) {
+                        // 에러 발생
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(err),
+                        ));
+                      },
+                    );
+                  },
+                ),
+
+                /// 회원가입 버튼
+                ElevatedButton(
+                  child: Text("회원가입", style: TextStyle(fontSize: 21)),
+                  onPressed: () {
+                    // 회원가입
+                    authService.signUp(
+                      email: emailController.text,
+                      password: passwordController.text,
+                      onSuccess: () {
+                        // 회원가입 성공
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("회원가입 성공"),
+                        ));
+                      },
+                      onError: (err) {
+                        // 에러 발생
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(err),
+                        ));
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// 홈페이지
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIdx = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> screens = [MainPage(), CalendarPage(), HallOfFame(), MyPage()];
+    return MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.amber,
         ),
-        home:Scaffold(
-          body:IndexedStack(
+        home: Scaffold(
+          body: IndexedStack(
             index: _selectedIdx,
-            children:screens,
+            children: screens,
           ),
           bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed, //눌러도 애니메이션 효과 없음
+            type: BottomNavigationBarType.fixed,
             iconSize: 30,
             selectedFontSize: 8,
             unselectedFontSize: 8,
@@ -57,10 +193,10 @@ class _MyAppState extends State<MyApp> {
             unselectedItemColor: Colors.black12,
             showUnselectedLabels: true,
             currentIndex: _selectedIdx,
-            onTap: (idx){ //네비게이션 바의 아이콘을 클릭했을 때
+            onTap: (idx) {
               setState(() {
-                _selectedIdx=idx; //아이콘의 index를 받아와서 selectedIdx에 대입
-              });//그렇게되면 setState()가 state가 바뀜 전달 => 화면 다시 렌더링
+                _selectedIdx = idx;
+              });
             },
             items: const [
               BottomNavigationBarItem(
@@ -79,17 +215,9 @@ class _MyAppState extends State<MyApp> {
                 icon: Icon(Icons.more_horiz),
                 label: "마이페이지",
               )
-
             ],
           ),
-        ),
-      // routes: <String, WidgetBuilder>{
-      // //'/': (BuildContext ctx) => MainPage(),
-      // '/calendar': (BuildContext ctx) => Calendar(),
-      // '/hallOfFame': (BuildContext ctx) => HallOfFame(),
-      // '/mypage': (BuildContext ctx) => MyPage(),
-      // },
+        )
     );
   }
 }
-

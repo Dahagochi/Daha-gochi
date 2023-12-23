@@ -20,7 +20,7 @@ class HallOfFame extends StatefulWidget {
 class _HallOfFameState extends State<HallOfFame> {
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[100],
+      backgroundColor: Colors.lightGreen[100],
       body: GridView.builder(
           physics: ScrollPhysics(),
           scrollDirection: Axis.vertical,
@@ -47,7 +47,7 @@ class _HallOfFameState extends State<HallOfFame> {
                         builder: (BuildContext context){
                           //widget
                           return AlertDialog(
-                            backgroundColor: Colors.amberAccent,
+                            backgroundColor: Colors.lightGreenAccent,
                             title: Text(
                               "Character Info",
                               style: TextStyle(
@@ -111,7 +111,7 @@ class _HallOfFameState extends State<HallOfFame> {
                     height: 30,
                     width: 300,
                     decoration: BoxDecoration(
-                      color: Colors.amberAccent,
+                      color: Colors.lightGreen[300],
                       borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
                     ),
                     child: Center(

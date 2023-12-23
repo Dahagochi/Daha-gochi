@@ -1,5 +1,6 @@
 // 코드 편집자 : 정승원
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'character.dart';
@@ -8,7 +9,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'bucketService.dart';
 import "dart:math";
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth_service.dart';
+import 'package:dahagochi/buttons/button_AppManual.dart';
+import 'todayBucketList.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 
 class MainPage extends StatefulWidget{
@@ -20,11 +25,10 @@ class MainPage extends StatefulWidget{
 class MainPageState extends State<MainPage> {
 
   SharedPreferences? prefs;
-  List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Done"), valueLabel: Text('123 / 150'))];   //temp value
-  List<Bucket> todayList = [];
+  //List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Progress"), valueLabel: Text('123 / 150'))];   //temp value
   // MyCharacter character;
 
-  _checkFirstOpenOfMonth() async {
+  _checkFirstOpen() async {         // 앱 설치 후 첫 접속 or 이번 달 첫 접속인 경우 dialog표시, 아닌 경우 서버에서 캐릭터 불러오기
     prefs = await SharedPreferences.getInstance();
 
     // Get the current month and year
@@ -36,17 +40,127 @@ class MainPageState extends State<MainPage> {
 
     // If it's the first open or a new month, show an alert
 
-    //if (storedMonthYear == null || storedMonthYear != currentMonthYear) {
-    if (1==1) {  // for debug
-      // MatureCharacter c = MatureCharacter();
-      // c.addCharacter(character);
-
-      //MyCharacter character = MyCharacter(name:'tempname', birth:currentMonthYear);
-
+    // if (storedMonthYear == null) {
+    if (1==1){  // temp line for debug
+      // showDialog(
+      //     context: context,
+      //     builder: (BuildContext context){
+      //       return Manual();
+      //     }
+      // );
+      _showManual();
+    }
+    // if (storedMonthYear != currentMonthYear){
+    if(1==1){ // temp line for debug
       _showAlert();
       prefs!.setString('lastOpenMonthYear', currentMonthYear);  // 저장된 날짜 최신화
 
+    } else{
+      ///todo : load character from server
     }
+  }
+
+  _showManual(){
+
+    final ManuImages = [
+      'assets/images/calendarManual.png',
+      'assets/images/mainPageManual.png',
+      'assets/images/hallOfFameManual.png'
+    ];
+    int _ManuIndex = 0;
+    String AppManualButtonText1 = 'close';
+    String AppManualButtonText2 = 'next';
+    showDialog(
+      //팝업창을 띄우는 위젯
+      barrierDismissible: false, //다른데 클릭해도 위젯 안 사라짐
+      context: context,
+      builder: (BuildContext cxt) {
+        //dialog widget
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              // 이거 없으면 alertDialogue에서 갱신이 닫을때만 적용
+              return AlertDialog(
+                backgroundColor: Colors.amberAccent,
+                title: Text(
+                  "App Manual",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+                content: Column(
+                  children: [
+                    Image.asset(ManuImages[_ManuIndex]),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    AnimatedSmoothIndicator(
+                      activeIndex: _ManuIndex,
+                      count: ManuImages.length,
+                      effect: WormEffect(
+                        dotColor: Colors.amber,
+                        activeDotColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          if (_ManuIndex == 0) {
+                            Navigator.of(context).pop();
+                          } else {
+                            _ManuIndex -= 1;
+                            setState(() {
+                              if (_ManuIndex == 0) {
+                                AppManualButtonText1 = 'close';
+                              } else {
+                                AppManualButtonText1 = 'prev';
+                                if (_ManuIndex == ManuImages.length - 2) {
+                                  AppManualButtonText2 = 'next';
+                                }
+                              }
+                            });
+                          }
+                        },
+                        child: Text(
+                          AppManualButtonText1,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          if (_ManuIndex == ManuImages.length - 1) {
+                            Navigator.of(context).pop();
+                          } else {
+                            _ManuIndex += 1;
+                            setState(() {
+                              if (_ManuIndex == ManuImages.length - 1) {
+                                AppManualButtonText2 = 'close';
+                              } else {
+                                AppManualButtonText2 = 'next';
+                                if (_ManuIndex == 1) {
+                                  AppManualButtonText1 = 'prev';
+                                }
+                              }
+                            });
+                          }
+                        },
+                        child: Text(
+                          AppManualButtonText2,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            });
+      },
+    );
   }
 
   _showAlert() {
@@ -83,86 +197,30 @@ class MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    // _checkFirstOpen();     // 도움말 dialog 표시하기
-    _checkFirstOpenOfMonth();      // _checkFirstOpen()함수의 기능 통합
-
-    // MyCharacter character = ;    // character 불러오기
+    _checkFirstOpen();      // _checkFirstOpen()함수의 기능 통합
   }
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.read<AuthService>();
+    final user = authService.currentUser()!;
     DateTime now = DateTime.now();
     return Consumer<BucketService>(
         builder: (context, bucketService, child) {
-          todayList = bucketService.getByDate(now);
+          //todayList = bucketService.getByDate(now);
           return Scaffold(
             backgroundColor: Colors.lightGreen[100],
             body: Column(
               children: [
 
                 //// 계획 리스트 컨테이너 ////
-
                 Expanded(
                   flex: 3,
-                  child: Container(
-                    height: 150,
-                    width: double.infinity,
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.lightGreen[100],
-                      //border: Border.all(color: Colors.black),
-                    ),
-
-
-                    child: todayList.isEmpty
-                      ? Center(
-                        child: ElevatedButton(
-                          child: Text('오늘의 계획을 세워보세요!'),
-                          onPressed: () {Navigator.pushNamed(context, '/calendar');},         //캘린더 페이지로 이동,
-                        ),
-                      )
-                        :ListView.separated( //// 계획리스트 및 체크박스 표시   /// 리스트길이==0일경우 캘린더이동버튼표시
-                      padding: const EdgeInsets.all(8),
-                      // itemCount: 4, // temp for debug
-                      itemCount: todayList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        // 역순으로 보여주기
-                        int i = todayList.length - index - 1;
-                        Bucket bucket = todayList[i];
-                        return ListTile(
-                          /// text
-                          title: Text(
-                            bucket.text,
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: Colors.black,
-                            ),
-                          ),
-
-                          /// createdAt
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Checkbox(
-                                  value: bucket.isDone,
-                                  onChanged: (value){
-                                    bucket.isDone=!bucket.isDone;
-
-                                    setState(() {});
-                                  }
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) => const Divider(),
-                    ),
-                  ),
+                  child: TodayBucketList(selectedDate: now),
                 ),
 
-                //// 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬) ////
 
+                //// 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬) ////
                 Expanded(
                     flex: 1,
                     child: Container(
@@ -227,7 +285,16 @@ class MainPageState extends State<MainPage> {
                                       // ),
                                       child: Center(
                                         child: PrimerProgressBar(
-                                            segments: segments, maxTotalValue: 100),
+                                            segments: [
+                                              Segment(
+                                                  value: 80,
+                                                  color: Colors.green,
+                                                  label: Text("Progress"),
+                                                  valueLabel: Text('123 / 150')
+                                              )
+                                            ],
+                                            maxTotalValue: 100
+                                        ),
                                       ),
                                     ),
                                   ),
