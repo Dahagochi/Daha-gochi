@@ -1,99 +1,178 @@
 //// 코드 편집자 : 정승원
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'bucketService.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-//이후 코드 작성자: 김지혜
-class Character extends ChangeNotifier {
-  final characterCollection = FirebaseFirestore.instance.collection(
-      'myCharacterRef'); // 스토리지에 존재하는 캐릭터 리스트를 불러옴
-  final DateTime date = DateTime.now();
+class MyCharacter extends ChangeNotifier{
 
-  Future<QuerySnapshot> getNowCharacter(String uid) async {
-    DateTime startOfMonth = DateTime(date.year, date.month, 1);
-    return characterCollection
-        .where('uid', isEqualTo: uid)
-        .where('birth', isEqualTo: Timestamp.fromDate(
-        startOfMonth)) //실행 당시 date의 생년월과 동일한 캐릭터 검색 => TODO- mainScreen.dart에 띄울 것
-        .where('progressIng',isEqualTo: true)
-        .get();
+  late String name;
+  String? birth;
+  late int maxProgress;
+  List<String> images = [
+    'assets/images/0.png',
+    'assets/images/1.png',
+    'assets/images/2.png',
+    'assets/images/3.png',
+  ];
+  List<String> comments = [];
+  int progress = 0;   // 계획을 하나 완료할 때마다 1씩 늘어나는 성장도
+  int level = 0;
+  bool progressIng = true;
+  late String uid;
+
+  MyCharacter(){
+    DateTime now = DateTime.now();
+    this.birth = DateFormat('yyyy-MM').format(now);
+    this.maxProgress = 5*daysInMonth(now);  // 5*해당 달의 일수
+
+    File fileContent = File('assets/text/0.txt');
+    this.comments = [
+      '한달동안 열심히 해보자!',
+      '난 계획을 실천한 만큼 성장해',
+      '내 이름은 삐요!'
+    ];
   }
 
-  void updateProgress(String docId, int completedPlan) async {
-    try {
-      // upateProgressAndLeve(docId,-1)같은 식으로 활용
-      DocumentSnapshot documentSnapshot = await characterCollection.doc(docId).get();
-      if (documentSnapshot.exists) {
-        Map<String, dynamic> characterData = documentSnapshot.data() as Map<String, dynamic>;
-        //progress 증감
-        int resultProgress = characterData['progress']+completedPlan;
-        // 진행률 파베에 반영
-        await characterCollection.doc(docId).update({'progress': resultProgress});
+  void updateProgressAndLevel(MyCharacter character, int completedPlan){
+    int currentLevel = character.level;
+    character.progress = completedPlan;
 
-        if(resultProgress==10 || resultProgress==29){
-          await characterCollection.doc(docId).update({'level': 1});//TODO imageurl 변경 반영
-        }
-        else if(resultProgress==9){
-          await characterCollection.doc(docId).update({'level':0});
-        }
-        else if (resultProgress==30 || resultProgress==69){
-          await characterCollection.doc(docId).update({'level': 2});
-        }
-        else if (resultProgress==70){
-          await characterCollection.doc(docId).update({'level': 3});
-        }
-        notifyListeners();
-      } else {
-        print('Document does not exist');
+    if((progress>=0) & (progress<10)) {
+      character.level=0;
+
+    } else if((progress >= 10) & (progress < 30)) {
+      character.level=1;
+      if(character.level != currentLevel) {
+        character.comments = [
+          '계획은 지킬 수 있는 만큼만!',
+          '조금만 힘내~'
+        ];
+
+        updateMyCharacter(character.uid, character.level, character.progress, character.progressIng, character.comments);
       }
-    } catch (e) {
-      print('Error updating progress and level: $e');
+    }else if((progress >= 30) & (progress < 70)) {
+      character.level=2;
+
+      if(character.level != currentLevel) {
+        character.comments = [
+          '오늘도 파이팅!',
+          '좋아 잘하고 있어!!'
+        ];
+
+        updateMyCharacter(character.uid, character.level, character.progress, character.progressIng, character.comments);
+      }
+    }else if(progress >= 70) {
+      character.level=3;
+
+      if(character.level != currentLevel) {
+        character.comments = [
+          '넌 정말 대단해!',
+          '노력은 배신하지 않아!'
+        ];
+
+        updateMyCharacter(character.uid, character.level, character.progress, character.progressIng, character.comments);
+      }
     }
   }
 
-  void createMyCharacter(String name, String uid, String imageUrl,
-        String comments) async
-    {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await characterCollection
-          .where('uid', isEqualTo: uid)
-          .where('birth', isEqualTo: Timestamp.fromDate(date)) //TODO date의 첫 날과 같은지
-          .get();
-
-      int maxprogress = (5 * daysInMonth(date));
-      DocumentReference documentRef = await characterCollection.add({
-        "name": name,
-        "birth": date,
-        "maxProgress": maxprogress,
-        "image": imageUrl,
-        "comments": comments,
-        "progress": 0,
-        "level": 0,
-        "uid": uid,
-        "progressIng": true
-      });
-    }
-
-    void updateMyCharacter(String uid, int level, int progress,
-        List<String> comments) async {
-      DocumentReference docRef = await characterCollection.doc(uid);
-      docRef.update({"level": level});
-      docRef.update({"progress": progress});
-      docRef.update({"comments": comments});
-    }
+  FirebaseFirestore db = FirebaseFirestore.instance;
 
 
-    int daysInMonth(DateTime date) {
-      // DateTime 객체를 이용하여 해당 월의 다음 월의 첫 날을 구합니다.
-      DateTime nextMonth = DateTime(date.year, date.month + 1, 1);
-
-      // 해당 월의 마지막 날짜는 다음 월의 첫 날의 하루 전입니다.
-      DateTime lastDayOfMonth = nextMonth.subtract(Duration(days: 1));
-
-      // 해당 월의 일수를 반환합니다.
-      return lastDayOfMonth.day;
-    }
+  void createMyCharacter(MyCharacter character, String uid) async {
+    CollectionReference myCharacterRef = db.collection('character');
+    DocumentReference documentRef = await myCharacterRef.add({
+      "name" : name,
+      "birth" : birth,
+      "maxProgress" : maxProgress,
+      "image" : images,
+      "comments": comments,
+      "progress": progress,
+      "level" : level,
+      "uid" : uid,
+      "progressIng" : progressIng
+    });
+    notifyListeners();
   }
+
+  // Future<QuerySnapshot> read(String uid, bool progressIng) async {
+  //   CollectionReference myCharacterRef = db.collection('users');
+  //   DocumentReference documentRef = myCharacterRef.doc('uid');
+  //
+  //   if (progressIng) {            // 메인페이지에서 표시할 캐릭터 읽기
+  //     return  myCharacterRef
+  //         .where('uid', isEqualTo: uid)
+  //         .where('progressIng', isEqualTo: progressIng)
+  //         .get();
+  //   } else {                   // 명예의전당에서 표시할 캐릭터 읽기
+  //     return myCharacterRef
+  //         .where('uid', isEqualTo: uid)
+  //         .where('progressIng', isEqualTo: progressIng)
+  //         .get()
+  //         .then((QuerySnapshot value) {
+  //           List<QueryDocumentSnapshot> list = value.docs;
+  //           list.forEach((QueryDocumentSnapshot element){
+  //             String name = element.get("name");
+  //             String birth = element.get('birth');
+  //             int progress = element.get('progress');
+  //           });
+  //         })
+  //         .catchError((onError) => print('Error Occured'));
+  //   }
+  // }
+
+  void updateMyCharacter(String uid, int level, int progress, bool progressIng, List<String> comments) async {
+    CollectionReference myCharacterRef = db.collection('character');
+    DocumentReference docRef = await myCharacterRef.doc(uid);
+    docRef.update({"level" : level});
+    docRef.update({"progress" : progress});
+    docRef.update({"comments" : comments});
+    docRef.update({"progressIng" : progressIng});
+
+    notifyListeners();
+  }
+
+  void deleteMyCharacter(String uid) async {
+    CollectionReference myCharacterRef = db.collection('character');
+    DocumentReference docRef = await myCharacterRef.doc(uid);
+    docRef.delete();
+
+    notifyListeners();
+  }
+}
+
+//
+//
+//
+// class MatureCharacter{
+//   late List<MyCharacter> matureCharacters;
+//
+//   MatureCharacter() {
+//     matureCharacters = [];
+//   }
+//
+//   void addCharacter(MyCharacter character) {
+//     matureCharacters.add(character);
+//   }
+//
+//   Character getCharacterByName(String name) {
+//     return characters.firstWhere((character) => character.name == name);
+//   }
+//
+//   void updateCharacter(Character updatedCharacter) {
+//     characters.removeWhere((character) => character.name == updatedCharacter.name);
+//     characters.add(updatedCharacter);
+//   }
+//
+//   void deleteCharacter(String name) {
+//     characters.removeWhere((character) => character.name == name);
+//   }
+//
+//   List<Character> getAllCharacters() {
+//     return characters;
+//   }
+// }

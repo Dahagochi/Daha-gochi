@@ -1,14 +1,15 @@
 import 'package:dahagochi/hallOfFame.dart';
 import 'package:dahagochi/mainPage.dart';
 import 'package:dahagochi/myPage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'auth_service.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'bucketService.dart';
 import 'calendarPage.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'bottomNav.dart';
+import 'package:flutter/cupertino.dart';
+import 'auth_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'character.dart';
 
@@ -22,9 +23,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => BucketService()),
-        ChangeNotifierProvider(create: (context) => Character()),
+        ChangeNotifierProvider(create: (context) => AuthService()),
+        ChangeNotifierProvider(create: (context) => MyCharacter()),
       ],
       child: const MyApp(),
     ),
