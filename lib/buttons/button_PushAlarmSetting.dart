@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dahagochi/Alarm_Time_Set.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PushAlarmSetting extends StatefulWidget {
   const PushAlarmSetting({super.key});
@@ -14,9 +16,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
   bool _AlarmVib = false;
   int _AlarmHour = alarmTime.hour;
   int _AlarmMin = alarmTime.minute;
-  String _AlarmHalf = alarmTime.hour>=12
-    ?'PM'
-    :'AM';
+  String _AlarmHalf = alarmTime.hour >= 12 ? 'PM' : 'AM';
   //알람 세팅 요소(표시용 임시 변수)
 
   String PushAlarmStatusText = 'Push Alarm Unabled';
@@ -27,14 +27,47 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
   String PushAlarmhalfText = 'AM';
   //알람 세팅 표시용 텍스트
 
-  Map<String, dynamic> AlarmSetting = {
-    "AlarmOn": false,
-    "AlarmSound": false,
-    "AlarmVib": false,
-    "AlarmHour": 0,
-    "AlarmMin": 0,
-    "AlarmtimeHalf": 'AM'
-  }; //알람 세팅 요소(진)
+  Map<String, dynamic> AlarmSetting = {}; //알람 세팅 요소(진)
+
+  bool isInList(List<dynamic>myList, dynamic value){
+    return myList.contains(value);
+  }
+
+  late SharedPreferences _prefs;
+
+   Future<void> resetData(Map<String, dynamic> AlarmSetting) async {//알람 정보 초기화(최초 접속시 1회)
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('AlarmOn');
+    await prefs.remove('AlarmSound');
+    await prefs.remove('AlarmVib');
+    await prefs.remove('AlarmHour');
+    await prefs.remove('AlarmMin');
+    await prefs.remove('AlarmtimeHalf');
+  }
+
+
+  Future<void> saveData(Map<String, dynamic> AlarmSetting) async {//알람 정보 modify
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('AlarmOn', AlarmSetting["AlarmOn"]);
+    await prefs.setBool('AlarmSound', AlarmSetting["AlarmSound"]);
+    await prefs.setBool('AlarmVib', AlarmSetting["AlarmVib"]);
+    await prefs.setInt('AlarmHour', AlarmSetting["AlarmHour"]);
+    await prefs.setInt('AlarmMin', AlarmSetting["AlarmMin"]);
+    await prefs.setString('AlarmtimeHalf', AlarmSetting["AlarmtimeHalf"]);
+  }
+
+  Future<Map<String, dynamic>> readData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> alarmSettings = {
+      'AlarmOn': prefs.getBool('AlarmOn') ?? false,
+      'AlarmSound': prefs.getBool('AlarmSound') ?? false,
+      'AlarmVib': prefs.getBool('AlarmVib') ?? false,
+      'AlarmHour': prefs.getInt('AlarmHour') ?? 0,
+      'AlarmMin': prefs.getInt('AlarmMin') ?? 0,
+      'AlarmtimeHalf': prefs.getString('AlarmtimeHalf') ?? 'AM',
+    };
+    return alarmSettings;
+  }
 
   void UpdateAlarmSettingText() {
     setState(() {
@@ -45,28 +78,43 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
           _AlarmVib ? 'Alarm Vib abled' : 'Alarm Vib Unabled';
       _AlarmHour = alarmTime.hour;
       _AlarmMin = alarmTime.minute;
-      _AlarmHalf = alarmTime.hour>=12
-        ?'PM'
-        :'AM';
-      PushAlarmHourText = _AlarmHour>=12
-      ?(_AlarmHour-12).toString()
-      :_AlarmHour.toString();
-      PushAlarmMinText = _AlarmMin>=10
-        ?_AlarmMin.toString()
-        :'0'+_AlarmMin.toString();
+      _AlarmHalf = alarmTime.hour >= 12 ? 'PM' : 'AM';
+      PushAlarmHourText = _AlarmHour >= 12
+          ? (_AlarmHour - 12).toString()
+          : _AlarmHour.toString();
+      PushAlarmMinText =
+          _AlarmMin >= 10 ? _AlarmMin.toString() : '0' + _AlarmMin.toString();
       PushAlarmhalfText = _AlarmHalf;
-
-      print('updated');
     });
   } //알람 세팅 텍스트 갱신
 
+  void initState() {
+    super.initState();
+    // Load saved data when the widget initializes
+    readData().then((alarmSettings) {
+      setState(() {
+        AlarmSetting = alarmSettings;
+        alarmTime=DateTime(1999, 12, 29, AlarmSetting['AlarmHour'],AlarmSetting['AlarmMin']);
+      });
+      UpdateAlarmSettingText();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    DialogState dialogState = Provider.of<DialogState>(context);
+
+    if (dialogState.isDialogClosed) {
+      UpdateAlarmSettingText();
+    }
+
     return Container(
       height: 70,
       width: 400,
       child: ElevatedButton(
         onPressed: () {
+          Provider.of<DialogState>(context, listen: false).setDialogClosed(false);
+
           setState(() {
             //initialize
             AlamOn = AlarmSetting["AlarmOn"];
@@ -75,6 +123,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
           });
 
           UpdateAlarmSettingText();
+          //readData();
 
           showDialog(
             //팝업창을 띄우는 위젯
@@ -85,7 +134,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
               return StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
                 return AlertDialog(
-                  backgroundColor: Colors.amberAccent,
+                  backgroundColor: Colors.lightGreen,
                   title: const Text(
                     "Push Alarm Setting",
                     style: TextStyle(
@@ -108,7 +157,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                           const Spacer(),
                           Switch(
                               activeTrackColor: Colors.white,
-                              activeColor: Colors.amber,
+                              activeColor: Colors.lightGreen,
                               value: AlamOn,
                               onChanged: (value) {
                                 setState(() {
@@ -127,7 +176,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                           Text(
                             PushAlarmSoundStatusText,
                             style: TextStyle(
-                              color: AlamOn ? Colors.white : Colors.amberAccent,
+                              color: AlamOn ? Colors.white : Colors.lightGreen,
                               fontSize: 15,
                             ),
                           ),
@@ -136,12 +185,12 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                             visible: AlamOn,
                             child: Switch(
                                 inactiveThumbColor:
-                                    AlamOn ? Colors.white : Colors.amberAccent,
+                                    AlamOn ? Colors.white : Colors.lightGreen,
                                 inactiveTrackColor: AlamOn
                                     ? Color.fromARGB(255, 61, 55, 36)
-                                    : Colors.amberAccent,
+                                    : Colors.lightGreen,
                                 activeTrackColor: Colors.white,
-                                activeColor: Colors.amber,
+                                activeColor: Colors.lightGreen,
                                 value: _AlarmSound,
                                 onChanged: (value) {
                                   if (AlamOn) {
@@ -159,7 +208,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                           Text(
                             PushAlarmVibStatusText,
                             style: TextStyle(
-                              color: AlamOn ? Colors.white : Colors.amberAccent,
+                              color: AlamOn ? Colors.white : Colors.lightGreen,
                               fontSize: 15,
                             ),
                           ),
@@ -168,12 +217,12 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                             visible: AlamOn,
                             child: Switch(
                                 inactiveThumbColor:
-                                    AlamOn ? Colors.white : Colors.amberAccent,
+                                    AlamOn ? Colors.white : Colors.lightGreen,
                                 inactiveTrackColor: AlamOn
                                     ? Color.fromARGB(255, 61, 55, 36)
-                                    : Colors.amberAccent,
+                                    : Colors.lightGreen,
                                 activeTrackColor: Colors.white,
-                                activeColor: Colors.amber,
+                                activeColor: Colors.lightGreen,
                                 value: _AlarmVib,
                                 onChanged: (value) {
                                   if (AlamOn) {
@@ -194,18 +243,18 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                           Text(
                             "Alarm Time:",
                             style: TextStyle(
-                              color: AlamOn ? Colors.white : Colors.amberAccent,
+                              color: AlamOn ? Colors.white : Colors.lightGreen,
                             ),
                           ),
                           const Spacer(),
                           Text(
                             PushAlarmHourText +
-                            " : " +
-                            PushAlarmMinText +
-                            " " +
-                            PushAlarmhalfText,
+                                " : " +
+                                PushAlarmMinText +
+                                " " +
+                                PushAlarmhalfText,
                             style: TextStyle(
-                              color: AlamOn ? Colors.white : Colors.amberAccent,
+                              color: AlamOn ? Colors.white : Colors.lightGreen,
                             ),
                           ),
                         ],
@@ -220,16 +269,15 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                             visible: AlamOn,
                             child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.amber,
+                                  backgroundColor: Colors.lightGreen,
                                   foregroundColor: Colors.white,
                                 ),
                                 onPressed: () {
-                                  UpdateAlarmSettingText();
                                   showDialog(
                                       barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext Context) {
-                                        return AlarmTimeSet(callback: UpdateAlarmSettingText);
+                                        return AlarmTimeSet();
                                       });
                                 },
                                 child: Text(
@@ -263,7 +311,11 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
                             AlarmSetting["AlarmVib"] = _AlarmVib;
                             AlarmSetting["AlarmHour"] = _AlarmHour;
                             AlarmSetting["AlarmMin"] = _AlarmMin;
+                            AlarmSetting["AlarmtimeHalf"] = _AlarmHalf;
+                            saveData(AlarmSetting);
                             Navigator.of(context).pop();
+                            int minu= AlarmSetting['AlarmMin'];
+                            print(minu);
                           },
                           child: Text(
                             "apply",
@@ -282,7 +334,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           ),
-          backgroundColor: Colors.amber,
+          backgroundColor: Colors.lightGreen,
           foregroundColor: Colors.white,
         ),
         child: Text("Push Alarm Setting"),

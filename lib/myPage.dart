@@ -20,7 +20,7 @@ class _MyPageState extends State<MyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.amber[100],
+        backgroundColor: Colors.white,
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

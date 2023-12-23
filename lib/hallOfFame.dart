@@ -19,15 +19,15 @@ class HallOfFame extends StatefulWidget {
 class _HallOfFameState extends State<HallOfFame> {
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.amber[100],
+      backgroundColor: Colors.white,
       body: GridView.builder(
         physics: ScrollPhysics(),
         scrollDirection: Axis.vertical,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, //1개 행 당 item 개수 
 
-          mainAxisSpacing: 10.0, //수평 패딩
-          crossAxisSpacing: 10.0, //수직 패딩
+          mainAxisSpacing: 0.0,
+          crossAxisSpacing: 10.0, 
           
           childAspectRatio: 1.0, //item의 가로세로 비율
           ), 
@@ -37,8 +37,10 @@ class _HallOfFameState extends State<HallOfFame> {
             child: Column(
               children: [
                 ElevatedButton(
-                  style: ButtonStyle(
-                    
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    )
                   ),
                   onPressed: (){
                     showDialog(
@@ -46,7 +48,7 @@ class _HallOfFameState extends State<HallOfFame> {
                       builder: (BuildContext context){
                         //widget
                         return AlertDialog(
-                          backgroundColor: Colors.amberAccent,
+                          backgroundColor: Color.fromARGB(255, 154, 198, 104),
                           title: Text(
                             "Character Info",
                             style: TextStyle(
@@ -54,7 +56,7 @@ class _HallOfFameState extends State<HallOfFame> {
                             ),
                           ),
                           content: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "Name: "+CharacterList[index]["name"],
@@ -101,7 +103,15 @@ class _HallOfFameState extends State<HallOfFame> {
                       },
                     );
                   }, 
-                  child: Image.asset(CharacterList[index]["image"]),
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: 200, 
+                    maxWidth: 200,),
+                  child: Image.asset(CharacterList[index]["image"],
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                  
                 ),
                 SizedBox(
                   height: 2,
@@ -110,12 +120,15 @@ class _HallOfFameState extends State<HallOfFame> {
                     height: 30,
                     width: 300,
                     decoration: BoxDecoration(
-                      color: Colors.amberAccent,
+                      color: Colors.lightGreen,
                       borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
                     ),
                     child: Center(
                       child: Text(
                         CharacterList[index]["name"],
+                        style: TextStyle(
+                          color: Colors.white,
+                          ),
                       ),
                     ),
                 ),

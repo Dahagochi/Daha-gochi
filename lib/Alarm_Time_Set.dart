@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:time_picker_spinner/time_picker_spinner.dart';
-import 'package:dahagochi/buttons/button_PushAlarmSetting.dart';
-
+import 'package:provider/provider.dart';
 
 DateTime alarmTime = DateTime(1999, 12, 31, 9, 0);
 DateTime tmpTime = DateTime(1999, 12, 31, 9, 0);
 
-class AlarmTimeSet extends StatefulWidget {
-  final Function callback;
+class DialogState extends ChangeNotifier{
+  bool _isDialogClosed = false;
 
-  const AlarmTimeSet({
-    required this.callback,
-    super.key
-    });
+  bool get isDialogClosed => _isDialogClosed;
+
+  void setDialogClosed(bool value) {
+    _isDialogClosed = value;
+    notifyListeners();
+  }
+}
+
+class AlarmTimeSet extends StatefulWidget {
+
+  const AlarmTimeSet({super.key});
 
   @override
   State<AlarmTimeSet> createState() => _AlarmTimeSetState();
@@ -23,7 +29,7 @@ class _AlarmTimeSetState extends State<AlarmTimeSet> {
   @override
   Widget build(context) {
     return AlertDialog(
-      backgroundColor: Colors.amberAccent,
+      backgroundColor: Colors.lightGreen,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -69,11 +75,13 @@ class _AlarmTimeSetState extends State<AlarmTimeSet> {
             ),
             TextButton(
               onPressed: () {
+                Navigator.of(context).pop();
                 setState(() {
                   alarmTime=tmpTime;
                 });
-                widget.callback;
-                Navigator.of(context).pop();
+
+                Provider.of<DialogState>(context, listen: false).setDialogClosed(true);
+
               },
               child: const Text(
                 'apply',

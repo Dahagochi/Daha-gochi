@@ -13,18 +13,43 @@ class DevInfo extends StatelessWidget {
             builder: (BuildContext cxt) {
               //dialog widget
               return AlertDialog(
-                backgroundColor: Colors.amberAccent,
+                backgroundColor: Colors.lightGreen,
                 title: Text(
                   "Dev info",
                   style: TextStyle(
                     color: Colors.white,
                   ),
                 ),
-                content: Text(
-                  "manual content",
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                  "중앙대학교 컴퓨터예술학과 20204656김지혜",
                   style: TextStyle(
                     color: Colors.white,
                   ),
+                ),
+                Text(
+                  "중앙대학교 수학과 20193711정승원",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  "중앙대학교 AI학과 20222020장이건",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 30,),
+                Text(
+                  "For 모바일프로그래밍",
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                  ],
                 ),
                 actions: [
                   TextButton(
@@ -44,7 +69,10 @@ class DevInfo extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.amber,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
+          backgroundColor: Colors.lightGreen,
           foregroundColor: Colors.white,
         ),
         child: Text("Dev. info"),

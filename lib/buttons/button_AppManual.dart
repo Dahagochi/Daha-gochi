@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+
 class AppManual extends StatefulWidget {
   AppManual({super.key});
 
@@ -48,7 +49,7 @@ class _AppManualState extends State<AppManual> {
                   builder: (BuildContext context, StateSetter setState) {
                 // 이거 없으면 alertDialogue에서 갱신이 닫을때만 적용
                 return AlertDialog(
-                  backgroundColor: Colors.amberAccent,
+                  backgroundColor: Colors.lightGreen,
                   title: Text(
                     "App Manual",
                     style: TextStyle(
@@ -57,16 +58,17 @@ class _AppManualState extends State<AppManual> {
                     ),
                   ),
                   content: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset(ManuImages[_ManuIndex]),
                       SizedBox(
-                        height: 10,
+                        height: 5,
                       ),
                       AnimatedSmoothIndicator(
                         activeIndex: _ManuIndex,
                         count: ManuImages.length,
                         effect: WormEffect(
-                          dotColor: Colors.amber,
+                          dotColor: Colors.lightGreen,
                           activeDotColor: Colors.white,
                         ),
                       ),
@@ -134,7 +136,7 @@ class _AppManualState extends State<AppManual> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
-          backgroundColor: Colors.amber,
+          backgroundColor: Colors.lightGreen,
           foregroundColor: Colors.white,
         ),
         child: Text("App Manual"),
