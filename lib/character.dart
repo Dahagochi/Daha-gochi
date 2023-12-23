@@ -8,9 +8,9 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
-class MyCharacter{
+class MyCharacter extends ChangeNotifier{
 
-  String name;
+  late String name;
   String? birth;
   late int maxProgress;
   List<String> images = [
@@ -25,13 +25,17 @@ class MyCharacter{
   bool progressIng = true;
   late String uid;
 
-  MyCharacter({required this.name}){
+  MyCharacter(){
     DateTime now = DateTime.now();
     this.birth = DateFormat('yyyy-MM').format(now);
     this.maxProgress = 5*daysInMonth(now);  // 5*해당 달의 일수
 
     File fileContent = File('assets/text/0.txt');
-    this.comments = fileContent.readAsLinesSync(encoding: utf8,);
+    this.comments = [
+      '한달동안 열심히 해보자!',
+      '난 계획을 실천한 만큼 성장해',
+      '내 이름은 삐요!'
+    ];
   }
 
   void updateProgressAndLevel(MyCharacter character, int completedPlan){
@@ -44,38 +48,43 @@ class MyCharacter{
     } else if((progress >= 10) & (progress < 30)) {
       character.level=1;
       if(character.level != currentLevel) {
-        File fileContent = File('assets/text/1.txt');
-        var fileContentList = fileContent.readAsLinesSync(encoding: utf8,);
-        character.comments = List.from(fileContentList)..addAll(comments);
+        character.comments = [
+          '계획은 지킬 수 있는 만큼만!',
+          '조금만 힘내~'
+        ];
 
-        updateMyCharacter(character.uid, character.level, character.progress, character.comments);
+        updateMyCharacter(character.uid, character.level, character.progress, character.progressIng, character.comments);
       }
     }else if((progress >= 30) & (progress < 70)) {
       character.level=2;
 
       if(character.level != currentLevel) {
-        File fileContent = File('assets/text/2.txt');
-        var fileContentList = fileContent.readAsLinesSync(encoding: utf8,);
-        character.comments = List.from(fileContentList)..addAll(comments);
+        character.comments = [
+          '오늘도 파이팅!',
+          '좋아 잘하고 있어!!'
+        ];
 
-        updateMyCharacter(character.uid, character.level, character.progress, character.comments);
+        updateMyCharacter(character.uid, character.level, character.progress, character.progressIng, character.comments);
       }
     }else if(progress >= 70) {
       character.level=3;
 
       if(character.level != currentLevel) {
-        File fileContent = File('assets/text/3.txt');
-        var fileContentList = fileContent.readAsLinesSync(encoding: utf8,);
-        character.comments = List.from(fileContentList)..addAll(comments);
+        character.comments = [
+          '넌 정말 대단해!',
+          '노력은 배신하지 않아!'
+        ];
 
-        updateMyCharacter(character.uid, character.level, character.progress, character.comments);
+        updateMyCharacter(character.uid, character.level, character.progress, character.progressIng, character.comments);
       }
     }
   }
 
-  CollectionReference myCharacterRef = FirebaseFirestore.instance.collection('character');
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
 
   void createMyCharacter(MyCharacter character, String uid) async {
+    CollectionReference myCharacterRef = db.collection('character');
     DocumentReference documentRef = await myCharacterRef.add({
       "name" : name,
       "birth" : birth,
@@ -87,39 +96,52 @@ class MyCharacter{
       "uid" : uid,
       "progressIng" : progressIng
     });
+    notifyListeners();
   }
 
-  Future<QuerySnapshot> read(String uid, bool progressIng) async {
-    if (progressIng) {            // 메인페이지에서 표시할 캐릭터 읽기
-      return myCharacterRef
-          .where('uid', isEqualTo: uid)
-          .where('progressIng', isEqualTo: progressIng)
-          .get();
-    } else {
-      return myCharacterRef          // 명예의전당에서 표시할 캐릭터 읽기
-          .where('uid', isEqualTo: uid)
-          .where('progressIng', isEqualTo: progressIng)
-          .get()
-          .then((QuerySnapshot value) {
-            List<QueryDocumentSnapshot> list = value.docs;
-            list.forEach((QueryDocumentSnapshot element){
-              String name = element.get("name");            // null인 경우
-            });
-          });
-    }
-  }
+  // Future<QuerySnapshot> read(String uid, bool progressIng) async {
+  //   CollectionReference myCharacterRef = db.collection('users');
+  //   DocumentReference documentRef = myCharacterRef.doc('uid');
+  //
+  //   if (progressIng) {            // 메인페이지에서 표시할 캐릭터 읽기
+  //     return  myCharacterRef
+  //         .where('uid', isEqualTo: uid)
+  //         .where('progressIng', isEqualTo: progressIng)
+  //         .get();
+  //   } else {                   // 명예의전당에서 표시할 캐릭터 읽기
+  //     return myCharacterRef
+  //         .where('uid', isEqualTo: uid)
+  //         .where('progressIng', isEqualTo: progressIng)
+  //         .get()
+  //         .then((QuerySnapshot value) {
+  //           List<QueryDocumentSnapshot> list = value.docs;
+  //           list.forEach((QueryDocumentSnapshot element){
+  //             String name = element.get("name");
+  //             String birth = element.get('birth');
+  //             int progress = element.get('progress');
+  //           });
+  //         })
+  //         .catchError((onError) => print('Error Occured'));
+  //   }
+  // }
 
-  void updateMyCharacter(String uid, int level, int progress, List<String> comments) async {
+  void updateMyCharacter(String uid, int level, int progress, bool progressIng, List<String> comments) async {
+    CollectionReference myCharacterRef = db.collection('character');
     DocumentReference docRef = await myCharacterRef.doc(uid);
     docRef.update({"level" : level});
     docRef.update({"progress" : progress});
     docRef.update({"comments" : comments});
-    
+    docRef.update({"progressIng" : progressIng});
+
+    notifyListeners();
   }
 
   void deleteMyCharacter(String uid) async {
+    CollectionReference myCharacterRef = db.collection('character');
     DocumentReference docRef = await myCharacterRef.doc(uid);
     docRef.delete();
+
+    notifyListeners();
   }
 }
 

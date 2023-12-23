@@ -31,7 +31,7 @@ class _TodayBucketListState extends State<TodayBucketList> {
               final documents =
                   snapshot.data?.docs ?? []; // 문서들 가져오기
               if (documents.isEmpty) {
-                return Center(child: Text("버킷 리스트를 작성해주세요."));
+                return Center(child: Text("버킷 리스트를 작성해주세요!"));
               }
               return ListView.builder(
                 itemCount: documents.length,

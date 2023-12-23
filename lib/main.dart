@@ -25,7 +25,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => BucketService()),
         ChangeNotifierProvider(create: (context) => AuthService()),
-        // ChangeNotifierProvider(create: (context) => MyCharacter()),
+        ChangeNotifierProvider(create: (context) => MyCharacter()),
       ],
       child: const MyApp(),
     ),
