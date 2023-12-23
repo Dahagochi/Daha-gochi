@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "839321766071",
+    "project_id": "daha-gochi",
+    "storage_bucket": "daha-gochi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:839321766071:android:b69bbb95bfc218fa2ee532",
+        "android_client_info": {
+          "package_name": "com.example.dahagochi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpM6nTqfBA3-at66Bu_fhswT4PtT3DkAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
