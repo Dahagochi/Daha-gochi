@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'mainPage.dart';
-import 'calenderPage.dart';
+import 'calendarPage.dart';
 import 'hallOfFame.dart';
 import 'myPage.dart';
 
@@ -14,7 +14,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> screens = [MainPage(), CalenderPage(), HallOfFame(), MyPage()];
+    List<Widget> screens = [MainPage(), CalendarPage(), HallOfFame(), MyPage()];
     return Scaffold(
       body: IndexedStack(
         index: _selectedIdx,

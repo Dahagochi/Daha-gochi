@@ -36,7 +36,7 @@ class AlertDialogUtils {
               children: [
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreen,),
+                    backgroundColor: Colors.lightGreen,),
                   child: Center(child: Text("알겠어요")),
                   onPressed: () {
                     Navigator.pop(context);
@@ -49,4 +49,5 @@ class AlertDialogUtils {
       },
     );
   }
+}
 }

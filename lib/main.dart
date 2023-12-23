@@ -10,6 +10,7 @@ import 'bucketService.dart';
 import 'calenderPage.dart';
 import 'firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'character.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => BucketService()),
+        // ChangeNotifierProvider(create: (context) => MyCharacter()),
       ],
       child: const MyApp(),
     ),

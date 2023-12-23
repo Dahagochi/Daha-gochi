@@ -42,4 +42,43 @@ class BucketService extends ChangeNotifier {
     notifyListeners(); // 화면 갱신
   }
 
+
+
+  // int calculateCompletedPlan(String date){               // 계획 체크버튼 갱신할때마다 계산해서 성장도에 반영
+  //   int i, j;
+  //   int lastday = daysInMonthFromString(date);
+  //   int completedPlan = 0;
+  //   List<Bucket> bucketList = [];
+  //
+  //   for (i=1; i<= lastday; i++){
+  //     if(i<=9) bucketList = getByDate(DateTime.parse('date-0${i}'));
+  //     if(i>10) bucketList = getByDate(DateTime.parse('date-${i}'));
+  //     for (j = 0; j<=bucketList.length; j++){
+  //       if(bucketList[j].isDone == true) completedPlan++;
+  //     }
+  //   }
+  //   return completedPlan;
+  // }
 }
+
+int daysInMonth(DateTime date) {
+  // DateTime 객체를 이용하여 해당 월의 다음 월의 첫 날을 구합니다.
+  DateTime nextMonth = DateTime(date.year, date.month + 1, 1);
+
+  // 해당 월의 마지막 날짜는 다음 월의 첫 날의 하루 전입니다.
+  DateTime lastDayOfMonth = nextMonth.subtract(Duration(days: 1));
+
+  // 해당 월의 일수를 반환합니다.
+  return lastDayOfMonth.day;
+}
+// int daysInMonthFromString(String birth) {
+//   // 'yyyy-mm' 형식의 문자열을 '-'를 기준으로 나누어 List로 만듭니다.
+//   List<String> dateParts = birth.split('-');
+//
+//   // 년도와 월을 추출하여 정수로 변환합니다.
+//   int year = int.parse(dateParts[0]);
+//   int month = int.parse(dateParts[1]);
+//
+//   // daysInMonth 함수에 전달하여 해당 월의 일수를 얻습니다.
+//   return daysInMonth(year, month);
+// }
