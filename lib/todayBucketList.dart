@@ -70,9 +70,7 @@ class _TodayBucketListState extends State<TodayBucketList> {
                               activeColor: Colors.lightGreen,
                               value: isDone,
                               onChanged: (value) {
-                                setState(() {
-                                  isDone = isDone!;
-                                });
+                                bucketService.update(doc.id, !isDone);
                               })
                         ],
                       ),
