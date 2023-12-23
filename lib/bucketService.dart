@@ -14,8 +14,7 @@ class BucketService extends ChangeNotifier {
   Future<QuerySnapshot> read(String uid, DateTime date) async {
     return bucketCollection
         .where('uid', isEqualTo: uid)
-        // .where('selectedDate', isGreaterThanOrEqualTo: Timestamp.fromDate(date))
-        // .where('selectedDate', isLessThan: Timestamp.fromDate(date.add(Duration(days: 1))))
+        .where('selectedDate', isEqualTo: Timestamp.fromDate(date))
         .get();}
     /// Diary 작성
   void create(String text, String uid,DateTime selectedDate) async {

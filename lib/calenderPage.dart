@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dahagochi/bucketEditPage.dart';
 import 'package:dahagochi/bucketService.dart';
+import 'package:dahagochi/todayBucketList.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -60,48 +61,7 @@ class _CalenderPageState extends State<CalenderPage> {
                     ),
                     showCalender(bucketService),
                     Expanded(
-                      child: FutureBuilder<QuerySnapshot>(
-                          future: bucketService.read(user.uid, selectedDate),
-                          builder: (context, snapshot) {
-                            final documents =
-                                snapshot.data?.docs ?? []; // 문서들 가져오기
-                            if (documents.isEmpty) {
-                              return Center(child: Text("버킷 리스트를 작성해주세요."));
-                            }
-                            return ListView.builder(
-                              itemCount: documents.length,
-                              itemBuilder: (context, index) {
-                                final doc = documents[index];
-                                String text = doc.get('text');
-                                bool isDone = doc.get('isDone');
-                                return ListTile(
-                                  title: Text(
-                                    text,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      color:
-                                          isDone ? Colors.grey : Colors.black,
-                                      decoration: isDone
-                                          ? TextDecoration.lineThrough
-                                          : TextDecoration.none,
-                                    ),
-                                  ),
-                                  // 삭제 아이콘 버튼
-                                  trailing: IconButton(
-                                    icon: Icon(CupertinoIcons.delete),
-                                    onPressed: () {
-                                      // 삭제 버튼 클릭시
-                                      bucketService.delete(doc.id);
-                                    },
-                                  ),
-                                  onTap: () {
-                                    // 아이템 클릭하여 isDone 업데이트
-                                    bucketService.update(doc.id, !isDone);
-                                  },
-                                );
-                              },
-                            );
-                          }),
+                      child: TodayBucketList(selectedDate: selectedDate)
                     ),
                   ],
                 ),
@@ -111,36 +71,36 @@ class _CalenderPageState extends State<CalenderPage> {
 
           /// Floating Action Button
           floatingActionButton: FutureBuilder<QuerySnapshot>(
-              future: bucketService.read(user.uid, selectedDate),
-              builder: (context, snapshot) {
-                final documents = snapshot.data?.docs ?? [];
-                return FloatingActionButton(
-                  backgroundColor: Colors.lightGreen,
-                  elevation: 0,
-                  child: Icon(Icons.create, color: Colors.white),
-                  //backgroundColor: Colors.amber,
-                  onPressed: () {
-                    if (documents.length == 5) {
-                      AlertDialogUtils.showFlutterDialog(context);
-                      //SnackBar 구현하는법 context는 위에 BuildContext에 있는 객체를 그대로 가져오면 됨.
-                      //TODO
-                    } else {
-                      showCreateDialog(bucketService);
-                    }
-                  },
-                );
-              }),
+            future: bucketService.read(user.uid, selectedDate),
+            builder: (context, snapshot) {
+              final documents = snapshot.data?.docs ?? [];
+              return FloatingActionButton(
+                backgroundColor: Colors.lightGreen,
+                elevation: 0,
+                child: Icon(Icons.create, color: Colors.white),
+                onPressed: () {
+                  print(documents);
+                  if (documents.length == 5) {
+                    AlertDialogUtils.showFlutterDialog(context);
+                  } else {
+                    showCreateDialog(bucketService);
+                  }
+                },
+              );
+            },
+          ),
         );
       },
     );
   }
 
-  FutureBuilder<QuerySnapshot<Object?>> showCalender(BucketService bucketService) {
+  FutureBuilder<QuerySnapshot<Object?>> showCalender(
+      BucketService bucketService) {
     final user = context.read<AuthService>().currentUser();
     //TODO: singlescrollview로 만들어서 5개까지 보여주기...
     return FutureBuilder<QuerySnapshot>(
-          future: bucketService.read(user!.uid, selectedDate),
-          builder: (context, snapshot) {
+      future: bucketService.read(user!.uid, selectedDate),
+      builder: (context, snapshot) {
         return Container(
           child: Expanded(
             child: Container(
@@ -166,10 +126,10 @@ class _CalenderPageState extends State<CalenderPage> {
                     calendarFormat = format;
                   });
                 },
-                eventLoader: (date) {
-                  return snapshot.data?.docs ?? [];
-                  // 각 날짜에 해당하는 bucketList 보여주기
-                },
+                // eventLoader: (date) {
+                //   return snapshot.data?.docs ?? [];
+                //   // 각 날짜에 해당하는 bucketList 보여주기
+                // },
                 calendarStyle: CalendarStyle(
                   // today 색상 연하게, selectedDay는 진하게
                   selectedDecoration: BoxDecoration(
@@ -194,7 +154,7 @@ class _CalenderPageState extends State<CalenderPage> {
             ),
           ),
         );
-      }
+      },
     );
   }
 
@@ -214,7 +174,7 @@ class _CalenderPageState extends State<CalenderPage> {
             //cursorColor: Colors.amber,
             decoration: InputDecoration(
               hintText: "이 날 꼭 해야 할 일이 있나요?",
-              // 포커스 되었을 때 밑줄 색상
+              // 포커스 되었을 때 밑줄 색상F
               focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Colors.lightGreen),
               ),
@@ -222,9 +182,11 @@ class _CalenderPageState extends State<CalenderPage> {
             onSubmitted: (_) {
               // 엔터 누를 때 작성하기
               if (createTextController.text.isNotEmpty) {
-                bucketService.create(createTextController.text, user.uid,selectedDate);
+                bucketService.create(
+                    createTextController.text, user.uid, selectedDate);
               }
               Navigator.pop(context);
+              createTextController.text = '';
             },
           ),
           actions: [
@@ -241,7 +203,8 @@ class _CalenderPageState extends State<CalenderPage> {
             TextButton(
               onPressed: () {
                 if (createTextController.text.isNotEmpty) {
-                  bucketService.create(createTextController.text, user.uid,selectedDate);
+                  bucketService.create(
+                      createTextController.text, user.uid, selectedDate);
                 }
                 Navigator.pop(context);
               },
