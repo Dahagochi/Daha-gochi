@@ -1,3 +1,4 @@
+//작성자:정승원
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../manual.dart';

@@ -1,3 +1,5 @@
+//편집자:정승원,김지혜
+import 'package:dahagochi/Alarm_Time_Set.dart';
 import 'package:dahagochi/hallOfFame.dart';
 import 'package:dahagochi/mainPage.dart';
 import 'package:dahagochi/myPage.dart';
@@ -11,7 +13,7 @@ import 'bottomNav.dart';
 import 'package:flutter/cupertino.dart';
 import 'auth_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'character.dart';
+import 'myCharacter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +28,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => BucketService()),
         ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => MyCharacter()),
+        ChangeNotifierProvider(create: (context) => DialogState()),
       ],
       child: const MyApp(),
     ),

@@ -1,3 +1,4 @@
+//작성자:김지혜
 import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:dahagochi/bucketEditPage.dart';
 import 'package:dahagochi/bucketService.dart';
@@ -80,7 +81,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 elevation: 0,
                 child: Icon(Icons.create, color: Colors.white),
                 onPressed: () {
-                  print(documents);
+                  createTextController.text = '';
                   if (documents.length == 5) {
                     AlertDialogUtils.showFlutterDialog(context);
                   } else {
@@ -98,7 +99,6 @@ class _CalendarPageState extends State<CalendarPage> {
   FutureBuilder<QuerySnapshot<Object?>> showCalender(
       BucketService bucketService) {
     final user = context.read<AuthService>().currentUser();
-    //TODO: singlescrollview로 만들어서 5개까지 보여주기...
     return FutureBuilder<QuerySnapshot>(
       future: bucketService.read(user!.uid, selectedDate),
       builder: (context, snapshot) {
@@ -127,10 +127,6 @@ class _CalendarPageState extends State<CalendarPage> {
                     calendarFormat = format;
                   });
                 },
-                // eventLoader: (date) {
-                //   return snapshot.data?.docs ?? [];
-                //   // 각 날짜에 해당하는 bucketList 보여주기
-                // },
                 calendarStyle: CalendarStyle(
                   // today 색상 연하게, selectedDay는 진하게
                   selectedDecoration: BoxDecoration(
@@ -187,7 +183,6 @@ class _CalendarPageState extends State<CalendarPage> {
                     createTextController.text, user.uid, selectedDate);
               }
               Navigator.pop(context);
-              createTextController.text = '';
             },
           ),
           actions: [

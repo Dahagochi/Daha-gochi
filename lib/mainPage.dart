@@ -3,33 +3,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'character.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'myCharacter.dart';
 import 'package:primer_progress_bar/primer_progress_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'bucketService.dart';
-import "dart:math";
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_service.dart';
-import 'package:dahagochi/buttons/button_AppManual.dart';
 import 'todayBucketList.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-
-class MainPage extends StatefulWidget{
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
   State createState() => MainPageState();
 }
 
 class MainPageState extends State<MainPage> {
-
   FirebaseFirestore db = FirebaseFirestore.instance;
   SharedPreferences? prefs;
+  //
+  // DateTime selectedDate = DateTime.now();
+
   //List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Progress"), valueLabel: Text('123 / 150'))];   //temp value
   // MyCharacter character;
 
-  void _checkFirstOpen() async {         // 앱 설치 후 첫 접속 or 이번 달 첫 접속인 경우 dialog표시, 아닌 경우 서버에서 캐릭터 불러오기
+  void _checkFirstOpen() async {
+    // 앱 설치 후 첫 접속 or 이번 달 첫 접속인 경우 dialog표시, 아닌 경우 서버에서 캐릭터 불러오기
     final authService = context.read<AuthService>();
     final user = authService.currentUser()!;
     prefs = await SharedPreferences.getInstance();
@@ -44,24 +46,25 @@ class MainPageState extends State<MainPage> {
     // If it's the first open or a new month, show an alert
 
     // if (storedMonthYear == null) {
-    if (1==1){  // temp line for debug
+    if (storedMonthYear == null) {
+      // temp line for debug
       _showManual();
     }
 
+    MyCharacter character = MyCharacter();
     // if (storedMonthYear != currentMonthYear){
-    if(1==1){ // temp line for debug
-      _showAlert();
-      prefs!.setString('lastOpenMonthYear', currentMonthYear);  // 저장된 날짜 최신화
-      MyCharacter character = MyCharacter();
-      character.createMyCharacter(character, user.uid);
+    if (storedMonthYear != currentMonthYear) {
+      // temp line for debug
+      _showAlert(character);
+      prefs!.setString('lastOpenMonthYear', currentMonthYear); // 저장된 날짜 최신화
 
-    } else{
-      ///todo : load character from server
+      character.createMyCharacter(user.uid);
+    } else {
+      character.read(user.uid);
     }
   }
 
-  _showManual(){
-
+  _showManual() {
     final ManuImages = [
       'assets/images/calendarManual.png',
       'assets/images/mainPageManual.png',
@@ -78,92 +81,93 @@ class MainPageState extends State<MainPage> {
         //dialog widget
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-              // 이거 없으면 alertDialogue에서 갱신이 닫을때만 적용
-              return AlertDialog(
-                backgroundColor: Colors.amberAccent,
-                title: Text(
-                  "App Manual",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+          // 이거 없으면 alertDialogue에서 갱신이 닫을때만 적용
+          return AlertDialog(
+            backgroundColor: Colors.lightGreen,
+            title: Text(
+              "App Manual",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+              ),
+            ),
+            content: Column(
+              children: [
+                Image.asset(ManuImages[_ManuIndex]),
+                SizedBox(
+                  height: 10,
+                ),
+                AnimatedSmoothIndicator(
+                  activeIndex: _ManuIndex,
+                  count: ManuImages.length,
+                  effect: WormEffect(
+                    dotColor: Colors.lightGreen,
+                    activeDotColor: Colors.white,
                   ),
                 ),
-                content: Column(
-                  children: [
-                    Image.asset(ManuImages[_ManuIndex]),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    AnimatedSmoothIndicator(
-                      activeIndex: _ManuIndex,
-                      count: ManuImages.length,
-                      effect: WormEffect(
-                        dotColor: Colors.amber,
-                        activeDotColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                actions: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: () {
+              ],
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      if (_ManuIndex == 0) {
+                        Navigator.of(context).pop();
+                      } else {
+                        _ManuIndex -= 1;
+                        setState(() {
                           if (_ManuIndex == 0) {
-                            Navigator.of(context).pop();
+                            AppManualButtonText1 = 'close';
                           } else {
-                            _ManuIndex -= 1;
-                            setState(() {
-                              if (_ManuIndex == 0) {
-                                AppManualButtonText1 = 'close';
-                              } else {
-                                AppManualButtonText1 = 'prev';
-                                if (_ManuIndex == ManuImages.length - 2) {
-                                  AppManualButtonText2 = 'next';
-                                }
-                              }
-                            });
+                            AppManualButtonText1 = 'prev';
+                            if (_ManuIndex == ManuImages.length - 2) {
+                              AppManualButtonText2 = 'next';
+                            }
                           }
-                        },
-                        child: Text(
-                          AppManualButtonText1,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
+                        });
+                      }
+                    },
+                    child: Text(
+                      AppManualButtonText1,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (_ManuIndex == ManuImages.length - 1) {
+                        Navigator.of(context).pop();
+                      } else {
+                        _ManuIndex += 1;
+                        setState(() {
                           if (_ManuIndex == ManuImages.length - 1) {
-                            Navigator.of(context).pop();
+                            AppManualButtonText2 = 'close';
                           } else {
-                            _ManuIndex += 1;
-                            setState(() {
-                              if (_ManuIndex == ManuImages.length - 1) {
-                                AppManualButtonText2 = 'close';
-                              } else {
-                                AppManualButtonText2 = 'next';
-                                if (_ManuIndex == 1) {
-                                  AppManualButtonText1 = 'prev';
-                                }
-                              }
-                            });
+                            AppManualButtonText2 = 'next';
+                            if (_ManuIndex == 1) {
+                              AppManualButtonText1 = 'prev';
+                            }
                           }
-                        },
-                        child: Text(
-                          AppManualButtonText2,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
+                        });
+                      }
+                    },
+                    child: Text(
+                      AppManualButtonText2,
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
-              );
-            });
+              ),
+            ],
+          );
+        });
       },
     );
   }
 
-  _showAlert() {
+  _showAlert(dynamic document) {
+    final doc = document[0]; //어차피 검색후 반환되는 게 1개밖에 안될테니
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -174,7 +178,11 @@ class MainPageState extends State<MainPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Center(
-                  child: Image.asset('assets/images/0.png', width: 200, height: 200,),
+                  child: Image.network(
+                    doc.get('image'),
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
                 Text("이번 달도 계획을 실천하고"),
                 Text("친구와 함께 성장해 보아요!"),
@@ -199,150 +207,169 @@ class MainPageState extends State<MainPage> {
     super.initState();
     _checkFirstOpen();
   }
+  CalendarFormat calendarFormat = CalendarFormat.month;
 
-  @override
+  // 선택된 날짜
+  DateTime selectedDate = DateTime.now();
+
+  // create text controller
+    @override
   Widget build(BuildContext context) {
     final authService = context.read<AuthService>();
     final user = authService.currentUser()!;
-    DateTime now = DateTime.now();
-    return Scaffold(
-            backgroundColor: Colors.lightGreen[100],
-            body: Column(
-              children: [
-                Consumer<BucketService>(                         //// 계획 리스트 컨테이너 ///
-                  builder: (context, bucketService, child) {
-                  //todayList = bucketService.getByDate(now);
-                  return FutureBuilder(
-                      future: bucketService.read(user.uid, now),
-                      builder: (context, snapshot) {
-                        final documents =
-                        snapshot.data?.docs ?? []; // 문서들 가져오기
-                        if (documents.isEmpty) {
-                        return Center(child: Text("버킷 리스트를 작성해주세요!"));
-                        }
-                        return Expanded(
-                        flex: 3,
-                        child: TodayBucketList(selectedDate: now),                         /// todo : mainPage에 표시 bugfix
-                        );
-                       );
-                    }
+    return Consumer<BucketService>(
+      builder: (context, bucketService, child) {
+        return Scaffold(
+          // 키보드가 올라올 때 화면 밀지 않도록 만들기(overflow 방지)
+          resizeToAvoidBottomInset: false,
+          body: SafeArea(
+            child: Container(
+              color: Colors.lightGreen[100],
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  children: [
+                    /// 달력
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.only(top: 40, bottom: 20),
+                      child: const Text(
+                        "캘린더",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 5,),
+                    Expanded(
+                        child: TodayBucketList(selectedDate: selectedDate),
+                    ),
+                    CharacterState(user: user)
+                  ],
                 ),
+              ),
+            ),
+          ),
 
-                 //// 현재 키우고있는 캐릭터와 캐릭터의 정보를 표시할 컨테이너 (화면 하단에 정렬) ////
-                Consumer<MyCharacter>(
-                  builder: (context, character, child){
-                    CollectionReference myCharacterRef = db.collection('myCharacterRef');
-                    DocumentReference docRef = myCharacterRef.doc('uid');
-                    return FutureBuilder<QuerySnapshot>(
-                        future: myCharacterRef
-                                .where('uid', isEqualTo: user.uid)
-                                .where('progressIng', isEqualTo: character.progressIng)
-                                .get(),
-                        // future: docRef.get(''),
-                        builder: (context, snapshot){
-                          final documents = snapshot.data?.docs ?? [];
-                          // print('ll${documents.length}');   // for debug
-                          //final doc = documents[0];
-                          // if (documents.isEmpty) {
-                          //   return Center(child: Text("NULL"));
-                          // }
-                          return Expanded(
-                              flex: 1,
+          /// Floating Action Button
+        );
+      },
+    );
+  }
+  }
+
+
+class CharacterState extends StatelessWidget {
+  const CharacterState({
+    super.key,
+    required this.user,
+  });
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<MyCharacter>(
+      builder: (context, character, child) {
+        return FutureBuilder<QuerySnapshot>(
+            future: character.read(user.uid),
+            builder: (context, snapshot) {
+              try{
+                final documents = snapshot.data?.docs ?? [];
+                print("ㅋㅋ");
+                print(documents);
+              final doc = documents[0];
+              return Container(
+                height: 150,
+                width: double.infinity,
+                margin: EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.lightGreen[100],
+                  border: Border.all(color: Colors.black),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      // 캐릭터 이미지 표시  (중앙 정렬)
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.lightGreen,
+                        border: Border.all(color: Colors.black),
+                      ),
+                      margin: EdgeInsets.symmetric(horizontal: 10),
+                      width: 120,
+                      height: 120,
+                      child: Image.network(doc.get('image')),
+                    ),
+                    Expanded(
+                      child: Container(
+                        // 대사, 성장도 게이지 표시  (중앙 정렬)
+                        child: Column(
+                          children: [
+                            Expanded(
+                              // flex: 2,
                               child: Container(
-                                height: 150,
+                                /// 캐릭터 대사 컨테이너(Text위젯으로 변경예정)
+                                height: 30,
                                 width: double.infinity,
-                                padding: EdgeInsets.all(10),
-                                margin: EdgeInsets.all(10),
+                                padding: EdgeInsets.all(5),
+                                margin: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  color: Colors.lightGreen[100],
+                                  // shape: ,
+                                  color: Colors.lightGreen,
                                   border: Border.all(color: Colors.black),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container( // 캐릭터 이미지 표시  (중앙 정렬)
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.lightGreen,
-                                        border: Border.all(color: Colors.black),
-                                      ),
-                                      margin: EdgeInsets.symmetric(horizontal: 10),
-                                      width: 120,
-                                      height: 120,
-                                      child: Image.asset('assets/images/0.png'),         /// todo : level별 image
-                                    ),
-                                    Expanded(
-                                      child: Container( // 대사, 성장도 게이지 표시  (중앙 정렬)
-                                        child: Column(
-                                          children: [
-                                            Expanded(
-                                              // flex: 2,
-                                              child: Container(
-
-                                                /// 캐릭터 대사 컨테이너(Text위젯으로 변경예정)
-                                                height: 30,
-                                                width: double.infinity,
-                                                padding: EdgeInsets.all(5),
-                                                margin: EdgeInsets.all(5),
-                                                decoration: BoxDecoration(
-                                                  // shape: ,
-                                                  color: Colors.lightGreen,
-                                                  border: Border.all(color: Colors.black),
-                                                ),
-                                                child: Center(
-                                                  // child: Text('${(doc.get("comments")..shuffle()).first}'),   //접속할 때마다 캐릭터 코멘트 랜덤 출력
-                                                  child: Text('오늘도 화이팅!'),        // temp for debug
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              // flex: 3,
-                                              child: SizedBox(
-
-                                                /// 성장도 게이지 컨테이너(progress bar class구현)
-                                                height: 100,
-                                                width: double.infinity,
-                                                // padding: EdgeInsets.all(5),
-                                                // margin: EdgeInsets.all(5),
-                                                // decoration: BoxDecoration(
-                                                //   color: Colors.lightGreen,
-                                                //   border: Border.all(color: Colors.black),
-                                                // ),
-                                                child: Center(
-                                                  child: PrimerProgressBar(
-                                                      segments: [
-                                                        Segment(
-                                                            value: 80,
-                                                            color: Colors.green,
-                                                            label: Text("Progress"),
-                                                            valueLabel: Text(
-                                                                // '${doc.get("progress") / doc.get("maxProgress")}'
-                                                                '123 / 150'
-                                                            )    /// todo : progress / maxProgress
-                                                        )
-                                                      ],
-                                                      maxTotalValue: 100
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                child: Center(
+                                  // child: Text('${(doc.get("comments")..shuffle()).first}'),   //접속할 때마다 캐릭터 코멘트 랜덤 출력
+                                  child: Text(
+                                      doc.get('comments')), // temp for debug
                                 ),
-                              )
-                          );
-                        }
-                    );
+                              ),
+                            ),
+                            Expanded(
+                              // flex: 3,
+                              child: SizedBox(
+                                /// 성장도 게이지 컨테이너(progress bar class구현)
+                                height: 100,
+                                width: double.infinity,
+                                // padding: EdgeInsets.all(5),
+                                // margin: EdgeInsets.all(5),
+                                // decoration: BoxDecoration(
+                                //   color: Colors.lightGreen,
+                                //   border: Border.all(color: Colors.black),
+                                // ),
+                                child: Center(
+                                  child: PrimerProgressBar(segments: [
+                                    Segment(
+                                        value: doc.get('progress'),
+                                        color: Colors.green,
+                                        label: Text("성장도"),
+                                        valueLabel: Text(
+                                            '${doc.get("progress")} / ${doc.get("maxProgress")}')
 
-                  },
+                                      /// todo : progress / maxProgress
+                                    )
+                                  ], maxTotalValue: doc.get('maxProgress')),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+              );}
+              catch(e){
+                return Text("$e");
+              }
 
-              ],
-            ),
-          );
+            });
+      },
+    );
   }
 }
 

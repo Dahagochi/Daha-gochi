@@ -1,3 +1,4 @@
+//김지혜
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'auth_service.dart';
 import 'bucketService.dart';
+import 'myCharacter.dart';
 
 class TodayBucketList extends StatefulWidget {
   const TodayBucketList({
@@ -65,14 +67,24 @@ class _TodayBucketListState extends State<TodayBucketList> {
                                     : TextDecoration.none,
                               ),
                             ),
-                            Checkbox (
-                                activeColor: Colors.lightGreen,
-                                value: isDone,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isDone = isDone!;
-                                  });
-                                })
+                            Consumer<MyCharacter>(
+                              builder: (context,myCharacter,child) {
+                                return FutureBuilder<QuerySnapshot>(
+                                    future: myCharacter.read(user.uid),
+                                    builder: (context, snapshot) {
+                                      print(snapshot);
+                                    return Checkbox (
+                                        activeColor: Colors.lightGreen,
+                                        value: isDone,
+                                        onChanged: (value) {
+                                          bucketService.update(doc.id, !isDone);
+                                          //체크 후 성장도 반영
+                                          //isDone==true ? myCharacter.updateProgress(nowCharacter.id, 1):myCharacter.updateProgress(nowCharacter.id, -1);
+                                        });
+                                  }
+                                );
+                              }
+                            )
                           ],
                         ),
                       ),
@@ -117,10 +129,11 @@ class _TodayBucketListState extends State<TodayBucketList> {
                           );
                         },
                       ),
-                      onTap: () {
-                        // 아이템 클릭하여 isDone 업데이트
-                        bucketService.update(doc.id, !isDone);
-                      },
+                      // onTap: () {
+                      //   // 아이템 클릭하여 isDone 업데이트
+                      //   bucketService.update(doc.id, !isDone);
+                      //   isDone==true ? myCharacter.updateProgress(nowCharacter.id, 1):myCharacter.updateProgress(nowCharacter.id, -1);
+                      // },
                     ),
                   );
                 },

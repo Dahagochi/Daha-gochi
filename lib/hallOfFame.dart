@@ -1,54 +1,190 @@
-import 'package:flutter/material.dart';
+//작성자:다같이
+// import 'package:flutter/material.dart';
+//
+// const List<Map<String, dynamic>> CharacterList = [
+//   {
+//     "image": "images/0040060001972.jpg",
+//     "name": "fox1",
+//     "period": "null",
+//     "love": "null"
+//   },
+//   {
+//     "image": "images/0040060001982.jpg",
+//     "name": "lion1",
+//     "period": "null",
+//     "love": "null"
+//   },
+//   {
+//     "image": "images/0040060001972.jpg",
+//     "name": "fox1",
+//     "period": "null",
+//     "love": "null"
+//   },
+//   {
+//     "image": "images/0040060001972.jpg",
+//     "name": "fox1",
+//     "period": "null",
+//     "love": "null"
+//   },
+//   {
+//     "image": "images/0040060001972.jpg",
+//     "name": "fox1",
+//     "period": "null",
+//     "love": "null"
+//   },
+//   {
+//     "image": "images/0040060001972.jpg",
+//     "name": "fox1",
+//     "period": "null",
+//     "love": "null"
+//   },
+//   {
+//     "image": "images/0040060001972.jpg",
+//     "name": "fox1",
+//     "period": "null",
+//     "love": "null"
+//   },
+//   {
+//     "image": "images/0040060001982.jpg",
+//     "name": "lion1",
+//     "period": "null",
+//     "love": "null"
+//   },
+// ];
+// //캐릭터 이미지들을 담은 딕셔너리 리스트, period는 키운 기간, love는 최종호감도를 의미
+//
+// class HallOfFame extends StatefulWidget {
+//   @override
+//   _HallOfFameState createState() => _HallOfFameState();
+// }
+//
+// class _HallOfFameState extends State<HallOfFame> {
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//         backgroundColor: Colors.lightGreen[100],
+//         body: Container(
+//           color: Colors.grey[100],
+//           child: Container(
+//             margin: EdgeInsets.symmetric(horizontal: 25),
+//             child: Column(
+//               children: [
+//                 Container(
+//                   alignment: Alignment.centerLeft,
+//                   padding: EdgeInsets.only(top: 65),
+//                   child: const Text(
+//                     "명예의 전당",
+//                     style: TextStyle(
+//                       color: Colors.black,
+//                       fontSize: 22,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ),
+//                 Expanded(
+//                   child: GridView.builder(
+//                       physics: ScrollPhysics(),
+//                       scrollDirection: Axis.vertical,
+//                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//                         crossAxisCount: 2, //1개 행 당 item 개수
+//                         mainAxisSpacing: 10.0, //수평 패딩
+//                         crossAxisSpacing: 10.0, //수직 패딩
+//                         childAspectRatio: 1.0, //item의 가로세로 비율
+//                       ),
+//                       itemCount: CharacterList.length,
+//                       itemBuilder: (BuildContext context, int index) {
+//                         return Container(
+//                           child: Column(
+//                             children: [
+//                               ElevatedButton(
+//                                 style: ElevatedButton.styleFrom(
+//                                     backgroundColor: Colors.white),
+//                                 onPressed: () {
+//                                   showDialog(
+//                                     context: context,
+//                                     builder: (BuildContext context) {
+//                                       //widget
+//                                       return AboutCharacter(index: index);
+//                                     },
+//                                   );
+//                                 },
+//                                 child: Container(
+//                                     decoration: BoxDecoration(
+//                                       borderRadius: BorderRadius.vertical(
+//                                           top: Radius.circular(10)),
+//                                     ),
+//                                     width: 300,
+//                                     child: Image.asset(
+//                                         CharacterList[index]["image"])),
+//                               ),
+//                               Container(
+//                                 height: 30,
+//                                 width: 300,
+//                                 decoration: BoxDecoration(
+//                                   color: Colors.lightGreen,
+//                                   borderRadius: BorderRadius.vertical(
+//                                       bottom: Radius.circular(10)),
+//                                 ),
+//                                 child: Center(
+//                                   child: Text(
+//                                     CharacterList[index]["name"],
+//                                     style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+//                                   ),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         );
+//                       }),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ));
+//   }
+// }
+//
 
-const List<Map<String, dynamic>> CharacterList = [
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dahagochi/myCharacter.dart';
+import 'package:flutter/material.dart';
+import 'auth_service.dart';
+import 'bottomNav.dart';
+import 'package:provider/provider.dart';
+
+List<Map<String, dynamic>> CharacterList = [
   {
-    "image": "images/0040060001972.jpg",
-    "name": "fox1",
+    "image": "assets/images/0.png",
+    "name": "piyo",
     "period": "null",
     "love": "null"
   },
   {
-    "image": "images/0040060001982.jpg",
-    "name": "lion1",
+    "image": "assets/images/1.png",
+    "name": "momi",
     "period": "null",
     "love": "null"
   },
   {
-    "image": "images/0040060001972.jpg",
-    "name": "fox1",
+    "image": "assets/images/2.png",
+    "name": "haru",
     "period": "null",
     "love": "null"
   },
   {
-    "image": "images/0040060001972.jpg",
-    "name": "fox1",
+    "image": "assets/images/3.png",
+    "name": "kitkat",
     "period": "null",
     "love": "null"
   },
   {
-    "image": "images/0040060001972.jpg",
-    "name": "fox1",
+    "image": "assets/images/upset.png",
+    "name": "nami",
     "period": "null",
     "love": "null"
   },
-  {
-    "image": "images/0040060001972.jpg",
-    "name": "fox1",
-    "period": "null",
-    "love": "null"
-  },
-  {
-    "image": "images/0040060001972.jpg",
-    "name": "fox1",
-    "period": "null",
-    "love": "null"
-  },
-  {
-    "image": "images/0040060001982.jpg",
-    "name": "lion1",
-    "period": "null",
-    "love": "null"
-  },
+  // {"image": "images/0040060001972.jpg", "name": "fox1", "period": "null", "love": "null"},
+  // {"image": "images/0040060001972.jpg", "name": "fox1", "period": "null", "love": "null"},
+  // {"image": "images/0040060001982.jpg", "name": "lion1", "period": "null", "love": "null"},
 ];
 //캐릭터 이미지들을 담은 딕셔너리 리스트, period는 키운 기간, love는 최종호감도를 의미
 
@@ -58,40 +194,38 @@ class HallOfFame extends StatefulWidget {
 }
 
 class _HallOfFameState extends State<HallOfFame> {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.lightGreen[100],
-        body: Container(
-          color: Colors.grey[100],
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 25),
-            child: Column(
-              children: [
-                Container(
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.only(top: 65),
-                  child: const Text(
-                    "명예의 전당",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GridView.builder(
+    final authService = context.read<AuthService>();
+    final user = authService.currentUser()!;
+
+    return Consumer<MyCharacter>(
+      builder: (context, myCharacter, child) {
+        return FutureBuilder<QuerySnapshot>(
+            future: myCharacter.readAll(user.uid),
+            builder: (context, snapshot) {
+              final documents = snapshot.data?.docs ?? []; // 문서들 가져오기
+              if (documents.isEmpty) {
+                return Center(
+                    child: Container(child: Text("아직 함께한 친구들이 없네요!")));
+              } else
+                return Scaffold(
+                  backgroundColor: Colors.lightGreen[100],
+                  body: GridView.builder(
                       physics: ScrollPhysics(),
                       scrollDirection: Axis.vertical,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2, //1개 행 당 item 개수
-                        mainAxisSpacing: 10.0, //수평 패딩
-                        crossAxisSpacing: 10.0, //수직 패딩
+                        mainAxisSpacing: 5.0, //수평 패딩
+                        crossAxisSpacing: 5.0, //수직 패딩
                         childAspectRatio: 1.0, //item의 가로세로 비율
                       ),
-                      itemCount: CharacterList.length,
+                      itemCount: documents.length,
                       itemBuilder: (BuildContext context, int index) {
+                        final doc = documents[index];
                         return Container(
+                          margin: EdgeInsets.all(20),
                           child: Column(
                             children: [
                               ElevatedButton(
@@ -102,7 +236,7 @@ class _HallOfFameState extends State<HallOfFame> {
                                     context: context,
                                     builder: (BuildContext context) {
                                       //widget
-                                      return AboutCharacter(index: index);
+                                      return AboutCharacter(doc: doc);
                                     },
                                   );
                                 },
@@ -112,9 +246,10 @@ class _HallOfFameState extends State<HallOfFame> {
                                           top: Radius.circular(10)),
                                     ),
                                     width: 300,
-                                    child: Image.asset(
-                                        CharacterList[index]["image"])),
-                              ),
+                                    height: 130,
+                                    child: Image.network(
+                                        doc.get('image')),
+                              )),
                               Container(
                                 height: 30,
                                 width: 300,
@@ -125,8 +260,10 @@ class _HallOfFameState extends State<HallOfFame> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    CharacterList[index]["name"],
-                                    style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                                    doc.get('name'),
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
@@ -134,21 +271,21 @@ class _HallOfFameState extends State<HallOfFame> {
                           ),
                         );
                       }),
-                ),
-              ],
-            ),
-          ),
-        ));
+                  // bottomNavigationBar: BottomNav(),
+                );
+            });
+      },
+    );
   }
 }
 
 class AboutCharacter extends StatelessWidget {
   const AboutCharacter({
     super.key,
-    required this.index,
+    required this.doc,
   });
 
-  final int index;
+  final dynamic doc; //형식 잘 모르겠어서ㅠㅠ
 
   @override
   Widget build(BuildContext context) {
@@ -162,8 +299,8 @@ class AboutCharacter extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(vertical: 20),
               width: 120,
-              child: Image.asset(
-                CharacterList[index]["image"],
+              child: Image.network(
+                doc.get('image'),
               ),
             ),
             Column(
@@ -172,16 +309,16 @@ class AboutCharacter extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.only(bottom: 30),
                   child: Text(
-                    CharacterList[index]["name"],
+                    doc.get('name'),
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
+                // Text(
+                //   "태어난 날" + doc.get('birth').toDate().toString(),
+                //   style: TextStyle(fontSize: 15, color: Colors.grey),
+                // ),
                 Text(
-                  "함께 한 기간: " + CharacterList[index]["period"],
-                  style: TextStyle(fontSize: 15, color: Colors.grey),
-                ),
-                Text(
-                  "성장도:" + CharacterList[index]["love"],
+                  "성장도:" + doc.get('progress').toString(),
                   style: TextStyle(fontSize: 15, color: Colors.grey),
                 ),
               ],
@@ -215,163 +352,3 @@ class AboutCharacter extends StatelessWidget {
     );
   }
 }
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:dahagochi/character.dart';
-// import 'package:flutter/material.dart';
-// import 'auth_service.dart';
-// import 'bottomNav.dart';
-// import 'package:provider/provider.dart';
-//
-//
-// List<Map<String, dynamic>> CharacterList = [
-//   {"image": "assets/images/0.png", "name": "piyo", "period": "null", "love": "null"},
-//   {"image": "assets/images/1.png", "name": "momi", "period": "null", "love": "null"},
-//   {"image": "assets/images/2.png", "name": "haru", "period": "null", "love": "null"},
-//   {"image": "assets/images/3.png", "name": "kitkat", "period": "null", "love": "null"},
-//   {"image": "assets/images/upset.png", "name": "nami", "period": "null", "love": "null"},
-//   // {"image": "images/0040060001972.jpg", "name": "fox1", "period": "null", "love": "null"},
-//   // {"image": "images/0040060001972.jpg", "name": "fox1", "period": "null", "love": "null"},
-//   // {"image": "images/0040060001982.jpg", "name": "lion1", "period": "null", "love": "null"},
-// ];
-// //캐릭터 이미지들을 담은 딕셔너리 리스트, period는 키운 기간, love는 최종호감도를 의미
-//
-// class HallOfFame extends StatefulWidget {
-//
-//   @override
-//   _HallOfFameState createState()=> _HallOfFameState();
-// }
-// class _HallOfFameState extends State<HallOfFame> {
-//   FirebaseFirestore db = FirebaseFirestore.instance;
-//   Widget build(BuildContext context) {
-//
-//     final authService = context.read<AuthService>();
-//     final user = authService.currentUser()!;
-//
-//     return Consumer<MyCharacter>(
-//       builder: (context, character, child) {
-//         CollectionReference myCharacterRef = db.collection('myCharacterRef');
-//         DocumentReference docRef = myCharacterRef.doc('uid');
-//         return FutureBuilder<QuerySnapshot>(
-//             future: myCharacterRef
-//                 .where('uid', isEqualTo: user.uid)
-//                 .where('progressIng', isEqualTo: character.progressIng)
-//                 .get(),      // 성장이 끝난 캐릭터들의 정보를 받음
-//             builder: (context, snapshot){
-//               final documents = snapshot.data?.docs ?? [];
-//               // print('ll${documents.length}');    // for debug
-//               final doc = documents[0];
-//               return Scaffold(
-//                 backgroundColor: Colors.lightGreen[100],
-//                 body: GridView.builder(
-//                     physics: ScrollPhysics(),
-//                     scrollDirection: Axis.vertical,
-//                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//                       crossAxisCount: 2, //1개 행 당 item 개수
-//
-//                       mainAxisSpacing: 10.0, //수평 패딩
-//                       crossAxisSpacing: 10.0, //수직 패딩
-//
-//                       childAspectRatio: 1.0, //item의 가로세로 비율
-//                     ),
-//                     itemCount: CharacterList.length,
-//                     itemBuilder: (BuildContext context, int index){
-//                       return Container(
-//                         child: Column(
-//                           children: [
-//                             ElevatedButton(
-//                               style: ButtonStyle(
-//
-//                               ),
-//                               onPressed: (){
-//                                 showDialog(
-//                                   context: context,
-//                                   builder: (BuildContext context){
-//                                     //widget
-//                                     return AlertDialog(
-//                                       backgroundColor: Colors.lightGreenAccent,
-//                                       title: Text(
-//                                         "Character Info",
-//                                         style: TextStyle(
-//                                           color: Colors.white,
-//                                         ),
-//                                       ),
-//                                       content: Column(
-//                                         mainAxisAlignment: MainAxisAlignment.start,
-//                                         children: [
-//                                           Text(
-//                                             "Name: "+CharacterList[index]["name"],
-//                                             style: TextStyle(
-//                                               color: Colors.white,
-//                                             ),
-//                                           ),
-//                                           Text(
-//                                             "Period: "+CharacterList[index]["period"],
-//                                             style: TextStyle(
-//                                               color: Colors.white,
-//                                             ),
-//                                           ),
-//                                           Text(
-//                                             "Final Friendship: "+CharacterList[index]["love"],
-//                                             style: TextStyle(
-//                                               color: Colors.white,
-//                                             ),
-//                                           ),
-//                                           Container(
-//                                             height: 300,
-//                                             width: 300,
-//                                             child:
-//                                             Image.asset(
-//                                               CharacterList[index]["image"],
-//                                             ),
-//                                           ),
-//                                         ],
-//                                       ),
-//                                       actions: [
-//                                         TextButton(
-//                                           onPressed: (){
-//                                             Navigator.of(context).pop();
-//                                           },
-//                                           child: Text(
-//                                             "close",
-//                                             style: TextStyle(
-//                                               color: Colors.white,
-//                                             ),
-//                                           ),
-//                                         )
-//                                       ],
-//                                     );
-//                                   },
-//                                 );
-//                               },
-//                               child: Image.asset(CharacterList[index]["image"]),
-//                             ),
-//                             SizedBox(
-//                               height: 2,
-//                             ),
-//                             Container(
-//                               height: 30,
-//                               width: 300,
-//                               decoration: BoxDecoration(
-//                                 color: Colors.lightGreen[300],
-//                                 borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-//                               ),
-//                               child: Center(
-//                                 child: Text(
-//                                   CharacterList[index]["name"],
-//                                 ),
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       );
-//                     }
-//                 ),
-//                 // bottomNavigationBar: BottomNav(),
-//               );
-//             }
-//         );
-//       },
-//     );
-//
-//   }
-// }

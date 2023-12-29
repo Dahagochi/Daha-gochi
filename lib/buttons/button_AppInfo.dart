@@ -1,3 +1,4 @@
+//작성자:장이건
 import 'package:flutter/material.dart';
 
 class AppInfo extends StatelessWidget {
