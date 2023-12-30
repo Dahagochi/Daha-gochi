@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
     final user = context.read<AuthService>().currentUser();
     return MaterialApp(
       theme: ThemeData(
+        primaryColor: Colors.lightGreen,
         primarySwatch: Colors.lightGreen, // App의 기본 색상
         scaffoldBackgroundColor: Colors.white, // Scaffold의 배경 색상
       ),
@@ -72,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
         return Scaffold(
           appBar: AppBar(title: Text("로그인")),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -90,20 +91,39 @@ class _LoginPageState extends State<LoginPage> {
                 /// 이메일
                 TextField(
                   controller: emailController,
-                  decoration: InputDecoration(hintText: "이메일"),
+                  decoration: InputDecoration(hintText: "이메일",
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.lightGreen), // 비활성화된 상태의 밑줄 색상
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.lightGreen), // 활성화된 상태의 밑줄 색상
+                    ),
+                  ),
                 ),
 
                 /// 비밀번호
                 TextField(
                   controller: passwordController,
                   obscureText: false, // 비밀번호 안보이게
-                  decoration: InputDecoration(hintText: "비밀번호"),
+                  decoration: InputDecoration(hintText: "비밀번호",
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.lightGreen), // 비활성화된 상태의 밑줄 색상
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.lightGreen), // 활성화된 상태의 밑줄 색상
+                    ),
+                  ),
                 ),
                 SizedBox(height: 32),
 
                 /// 로그인 버튼
                 ElevatedButton(
-                  child: Text("로그인", style: TextStyle(fontSize: 21)),
+                  style:  ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10), // 0으로 설정하면 네모로 만들어집니다
+                    ),backgroundColor: Colors.lightGreen
+                  ),
+                  child: Text("로그인", style: TextStyle(fontSize: 21,color: Colors.white)),
                   onPressed: () {
                     // 로그인
                     authService.signIn(
@@ -133,7 +153,11 @@ class _LoginPageState extends State<LoginPage> {
 
                 /// 회원가입 버튼
                 ElevatedButton(
-                  child: Text("회원가입", style: TextStyle(fontSize: 21)),
+                  style:  ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10), // 0으로 설정하면 네모로 만들어집니다
+                      ),backgroundColor: Colors.lightGreen),
+                  child: Text("회원가입", style: TextStyle(fontSize: 21,color: Colors.white)),
                   onPressed: () {
                     // 회원가입
                     authService.signUp(
@@ -179,7 +203,7 @@ class _HomePageState extends State<HomePage> {
     List<Widget> screens = [MainPage(), CalendarPage(), HallOfFame(), MyPage()];
     return MaterialApp(
         theme: ThemeData(
-          primarySwatch: Colors.amber,
+          primarySwatch: Colors.lightGreen,
         ),
         home: Scaffold(
           body: IndexedStack(

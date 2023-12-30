@@ -79,7 +79,7 @@ class _TodayBucketListState extends State<TodayBucketList> {
                                         onChanged: (value) {
                                           bucketService.update(doc.id, !isDone);
                                           //체크 후 성장도 반영
-                                          //isDone==true ? myCharacter.updateProgress(nowCharacter.id, 1):myCharacter.updateProgress(nowCharacter.id, -1);
+                                          isDone==true ? myCharacter.updateProgress(user.uid, -1):myCharacter.updateProgress(user.uid, 1);
                                         });
                                   }
                                 );

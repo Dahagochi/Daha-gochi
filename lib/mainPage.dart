@@ -24,13 +24,14 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> {
   FirebaseFirestore db = FirebaseFirestore.instance;
   SharedPreferences? prefs;
+  MyCharacter character = MyCharacter();
   //
   // DateTime selectedDate = DateTime.now();
 
   //List<Segment> segments = [Segment(value: 80, color: Colors.green, label: Text("Progress"), valueLabel: Text('123 / 150'))];   //temp value
   // MyCharacter character;
 
-  void _checkFirstOpen() async {
+  Future<void> _checkFirstOpen() async {
     // 앱 설치 후 첫 접속 or 이번 달 첫 접속인 경우 dialog표시, 아닌 경우 서버에서 캐릭터 불러오기
     final authService = context.read<AuthService>();
     final user = authService.currentUser()!;
@@ -43,25 +44,26 @@ class MainPageState extends State<MainPage> {
     // Get the stored month and year
     String? storedMonthYear = prefs!.getString('lastOpenMonthYear');
 
-    // If it's the first open or a new month, show an alert
-
-    // if (storedMonthYear == null) {
+    //아예 처음 접속하는 경우
     if (storedMonthYear == null) {
       // temp line for debug
       _showManual();
+      character.createMyCharacter(user.uid);
     }
 
-    MyCharacter character = MyCharacter();
+    //최초 접속은 아니지만, 달이 바뀐 상태에서 접속한 경우
     // if (storedMonthYear != currentMonthYear){
-    if (storedMonthYear != currentMonthYear) {
+    else if (storedMonthYear != currentMonthYear) {
       // temp line for debug
-      _showAlert(character);
+      //_showAlert(character); TODO 나중에 주석처리 풀어둘 것
       prefs!.setString('lastOpenMonthYear', currentMonthYear); // 저장된 날짜 최신화
 
       character.createMyCharacter(user.uid);
-    } else {
-      character.read(user.uid);
+      print("캐릭터가 만들어졌어용!파베 확인을 해보세요!");
     }
+
+      character.read(user.uid);
+
   }
 
   _showManual() {
@@ -261,7 +263,7 @@ class MainPageState extends State<MainPage> {
   }
 
 
-class CharacterState extends StatelessWidget {
+class CharacterState extends StatefulWidget {
   const CharacterState({
     super.key,
     required this.user,
@@ -270,16 +272,19 @@ class CharacterState extends StatelessWidget {
   final User user;
 
   @override
+  State<CharacterState> createState() => _CharacterStateState();
+}
+
+class _CharacterStateState extends State<CharacterState> {
+  @override
   Widget build(BuildContext context) {
     return Consumer<MyCharacter>(
       builder: (context, character, child) {
         return FutureBuilder<QuerySnapshot>(
-            future: character.read(user.uid),
+            future: character.read(widget.user.uid),
             builder: (context, snapshot) {
               try{
                 final documents = snapshot.data?.docs ?? [];
-                print("ㅋㅋ");
-                print(documents);
               final doc = documents[0];
               return Container(
                 height: 150,
@@ -349,8 +354,6 @@ class CharacterState extends StatelessWidget {
                                         label: Text("성장도"),
                                         valueLabel: Text(
                                             '${doc.get("progress")} / ${doc.get("maxProgress")}')
-
-                                      /// todo : progress / maxProgress
                                     )
                                   ], maxTotalValue: doc.get('maxProgress')),
                                 ),

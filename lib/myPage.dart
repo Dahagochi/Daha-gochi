@@ -22,23 +22,24 @@ class _MyPageState extends State<MyPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        body: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                AppManual(),
-                SizedBox(
-                  height: ButtonHeight / 2,
-                  width: ButtonWidth,
-                ),
-                PushAlarmSetting(),
-                DevInfo(),
-                AppInfo(),
-              ],
-            ),
-          ],
-        ));
+        body:
+            Container(
+              decoration: BoxDecoration(color: Colors.lightGreen[100]),
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  AppManual(),
+                  SizedBox(
+                    height: ButtonHeight / 2,
+                    width: ButtonWidth,
+                  ),
+                  PushAlarmSetting(),
+                  DevInfo(),
+                  AppInfo(),
+                ],
+              ),
+        )
+    );
   }
 }

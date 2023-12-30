@@ -30,7 +30,7 @@ class _AppManualState extends State<AppManual> {
   Widget build(BuildContext context) {
     return Container(
       height: 70,
-      width: 400,
+      width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
           _ManuIndex = 0;
@@ -130,7 +130,7 @@ class _AppManualState extends State<AppManual> {
         },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(10),
           ),
           backgroundColor: Colors.lightGreen,
           foregroundColor: Colors.white,

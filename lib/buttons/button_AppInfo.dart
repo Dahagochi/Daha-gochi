@@ -5,8 +5,8 @@ class AppInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 70,
-        width: 400,
+      height: 70,
+        width: double.infinity,
         child: ElevatedButton(
           onPressed: () {
             showDialog(
@@ -46,7 +46,7 @@ class AppInfo extends StatelessWidget {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(cxt).pop();
                       },
                       child: Text(
                         "close",
@@ -63,7 +63,7 @@ class AppInfo extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
                 borderRadius:
-                    BorderRadius.vertical(bottom: Radius.circular(30))),
+                    BorderRadius.vertical(bottom: Radius.circular(10))),
             backgroundColor: Colors.lightGreen,
             foregroundColor: Colors.white,
           ),

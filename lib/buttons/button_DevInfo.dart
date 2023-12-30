@@ -5,13 +5,13 @@ class DevInfo extends StatelessWidget {
   Widget build(BuildContext ctx) {
     return Container(
       height: 70,
-      width: 400,
+      width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
           showDialog(
             //팝업창을 띄우는 위젯
             context: ctx,
-            builder: (BuildContext cxt) {
+            builder: (BuildContext context) {
               //dialog widget
               return AlertDialog(
                 backgroundColor: Colors.lightGreen,
@@ -55,7 +55,7 @@ class DevInfo extends StatelessWidget {
                 actions: [
                   TextButton(
                     onPressed: () {
-                      Navigator.of(ctx).pop();
+                      Navigator.of(context).pop();
                     },
                     child: Text(
                       "close",

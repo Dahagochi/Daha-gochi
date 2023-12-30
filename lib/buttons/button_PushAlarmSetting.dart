@@ -111,7 +111,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
 
     return Container(
       height: 70,
-      width: 400,
+      width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
           Provider.of<DialogState>(context, listen: false).setDialogClosed(false);
@@ -333,7 +333,7 @@ class _PushAlarmSettingState extends State<PushAlarmSetting> {
         },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
           ),
           backgroundColor: Colors.lightGreen,
           foregroundColor: Colors.white,

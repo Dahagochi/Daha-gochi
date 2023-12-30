@@ -79,7 +79,7 @@ class MyCharacter extends ChangeNotifier {
 
     // 1을 더하고 업데이트
     int updatedValue = currentProgress + completedPlan;
-    await documentReference.update({'property': updatedValue});
+    await documentReference.update({'progress': updatedValue});
     //레벨처리
     if (updatedValue < 10) {
       updateLevel(uid, 0);

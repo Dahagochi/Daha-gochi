@@ -31,7 +31,6 @@ class _ManualState extends State<Manual> {
   Widget build(BuildContext context) {
     return Container(
       height: 70,
-      width: 400,
       child: ElevatedButton(
         onPressed: () {
           _ManuIndex = 0;
@@ -47,7 +46,7 @@ class _ManualState extends State<Manual> {
                   builder: (BuildContext context, StateSetter setState) {
                     // 이거 없으면 alertDialogue에서 갱신이 닫을때만 적용
                     return AlertDialog(
-                      backgroundColor: Colors.amberAccent,
+                      backgroundColor: Colors.lightGreen,
                       title: Text(
                         "App Manual",
                         style: TextStyle(
@@ -65,7 +64,7 @@ class _ManualState extends State<Manual> {
                             activeIndex: _ManuIndex,
                             count: ManuImages.length,
                             effect: WormEffect(
-                              dotColor: Colors.amber,
+                              dotColor: Colors.lightGreen,
                               activeDotColor: Colors.white,
                             ),
                           ),
@@ -133,7 +132,7 @@ class _ManualState extends State<Manual> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
-          backgroundColor: Colors.amber,
+          backgroundColor: Colors.lightGreen,
           foregroundColor: Colors.white,
         ),
         child: Text("App Manual"),
